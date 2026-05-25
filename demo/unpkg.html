@@ -10,20 +10,79 @@
 		</style>
 	</head>
 	<body>
-		<h1>unpkg CDN sanity check</h1>
+		<h1>form-matching-fields via unpkg</h1>
 		<p>
 			This page loads the guarded definition helper from
 			<code>unpkg</code> and registers the element when supported.
 		</p>
 
-		<form-matching-fields>
-			<p>Replace this markup once you customize form-matching-fields.</p>
-		</form-matching-fields>
+		<section class="demo-section">
+			<h2>Password confirmation</h2>
+			<form>
+				<form-matching-fields>
+					<label for="password-unpkg">Password</label>
+					<input id="password-unpkg" type="password" required />
+
+					<label for="password-unpkg-again">Password again</label>
+					<input id="password-unpkg-again" type="password" required />
+				</form-matching-fields>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+
+		<section class="demo-section">
+			<h2>Email verification</h2>
+			<form>
+				<form-matching-fields>
+					<label for="email-unpkg">Email</label>
+					<input id="email-unpkg" type="email" required />
+
+					<label for="email-unpkg-again">Verify email</label>
+					<input id="email-unpkg-again" type="email" required />
+				</form-matching-fields>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+
+		<section class="demo-section">
+			<h2>Custom message</h2>
+			<form>
+				<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+					<label for="email-unpkg-custom">Email</label>
+					<input id="email-unpkg-custom" type="email" required />
+
+					<label for="email-unpkg-custom-again">Verify email</label>
+					<input id="email-unpkg-custom-again" type="email" required />
+				</form-matching-fields>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+
+		<section class="demo-section">
+			<h2>Localized message (Hindi)</h2>
+			<form>
+				<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+					<label for="password-unpkg-hi">पासवर्ड</label>
+					<input id="password-unpkg-hi" type="password" required />
+
+					<label for="password-unpkg-hi-again">पासवर्ड फिर से</label>
+					<input id="password-unpkg-hi-again" type="password" required />
+				</form-matching-fields>
+				<button type="submit">जमा करें</button>
+			</form>
+		</section>
 
 		<script type="module">
 			import { defineComponentName } from 'https://unpkg.com/@aarongustafson/form-matching-fields@latest/define.js?module';
 
 			defineComponentName();
+
+			document.querySelectorAll('form').forEach((form) => {
+				form.addEventListener('submit', (event) => {
+					event.preventDefault();
+					form.reportValidity();
+				});
+			});
 		</script>
 	</body>
 </html>

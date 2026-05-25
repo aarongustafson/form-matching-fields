@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@aarongustafson/form-matching-fields.svg)](https://www.npmjs.com/package/@aarongustafson/form-matching-fields) [![Build Status](https://img.shields.io/github/actions/workflow/status/aarongustafson/form-matching-fields/ci.yml?branch=main)](https://github.com/aarongustafson/form-matching-fields/actions)
 
-Web component that automatically adds validation rules that ensure the values of descendent fields match.
+Web component wrapper that adds additive validation to ensure two text-type fields match.
 
 ## Demo
 
@@ -48,46 +48,91 @@ customElements.define('my-custom-name', FormMatchingFieldsElement);
 
 ```html
 <form-matching-fields>
-  <!-- Your content here -->
+  <label for="password">Password</label>
+  <input id="password" type="password" required />
+
+  <label for="password-again">Password again</label>
+  <input id="password-again" type="password" required />
 </form-matching-fields>
 ```
+
+### How Matching Works
+
+This component intentionally keeps matching behavior simple:
+
+- It only looks at descendant input controls.
+- It only considers text-type inputs: text, email, password, search, tel, and url.
+- It ignores disabled and readonly fields.
+- It always compares the first two eligible fields.
+- It only applies mismatch validation when both fields are non-empty.
+- It pins mismatch validation to the second field.
+
+### Validation Stacking Behavior
+
+The component does not replace native or existing custom validation:
+
+- If the second field already has native validation issues (such as required or type mismatch), the component does not apply a mismatch message.
+- If the second field already has a custom validity message, the component does not replace it.
+- The component only clears a mismatch message that it previously set itself.
 
 ## Attributes
 
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `example-attribute` | `string` | `""` | Description of the attribute |
+| `validation-message` | `string` | `The fields “{label_1}” and “{label_2}” should match` | Custom mismatch message template. Supports placeholder replacement for `{label_1}` and `{label_2}`. |
 
-## Events
+## Properties
 
-The component fires custom events that you can listen to:
+| Property | Type | Description |
+|----------|------|-------------|
+| `validationMessage` | `string` | Property equivalent of `validation-message`. |
 
-| Event | Description | Detail |
-|-------|-------------|--------|
-| `form-matching-fields:event` | Fired when something happens | `{ data }` |
+## Message Label Resolution
 
-### Example Event Handling
+When replacing `{label_1}` and `{label_2}`, labels are resolved in this order:
 
-```javascript
-const element = document.querySelector('form-matching-fields');
+1. Associated `<label for>` text
+2. Wrapping `<label>` text
+3. `aria-label`
+4. `name`
+5. `id`
 
-element.addEventListener('form-matching-fields:event', (event) => {
-  console.log('Event fired:', event.detail);
-});
+## Examples
+
+### Email Verification
+
+```html
+<form-matching-fields>
+  <label for="email">Email</label>
+  <input id="email" type="email" required />
+
+  <label for="verify-email">Verify email</label>
+  <input id="verify-email" type="email" required />
+</form-matching-fields>
 ```
 
-## CSS Custom Properties
+### Custom Validation Message
 
-| Property | Default | Description |
-|----------|---------|-------------|
-| `--example-color` | `#000` | Example color property |
+```html
+<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+  <label for="email">Email</label>
+  <input id="email" type="email" required />
 
-### Example Styling
+  <label for="verify-email">Verify email</label>
+  <input id="verify-email" type="email" required />
+</form-matching-fields>
+```
 
-```css
-form-matching-fields {
-  --example-color: #ff0000;
-}
+### Localized (Hindi) Message
+
+```html
+<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+  <label for="password-hi">पासवर्ड</label>
+  <input id="password-hi" type="password" required />
+
+  <label for="password-hi-again">पासवर्ड फिर से</label>
+  <input id="password-hi-again" type="password" required />
+</form-matching-fields>
 ```
 
 ## Browser Support

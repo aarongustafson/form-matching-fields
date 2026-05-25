@@ -10,15 +10,66 @@
 		</style>
 	</head>
 	<body>
-		<h1>esm.sh CDN sanity check</h1>
+		<h1>form-matching-fields via esm.sh</h1>
 		<p>
-			This page loads the component class from <code>esm.sh</code> and
-			registers it manually.
+			This page loads the component class from <code>esm.sh</code> and registers it manually.
 		</p>
 
-		<form-matching-fields>
-			<p>Replace this markup once you customize form-matching-fields.</p>
-		</form-matching-fields>
+		<section class="demo-section">
+			<h2>Password confirmation</h2>
+			<form>
+				<form-matching-fields>
+					<label for="password-esm">Password</label>
+					<input id="password-esm" type="password" required />
+
+					<label for="password-esm-again">Password again</label>
+					<input id="password-esm-again" type="password" required />
+				</form-matching-fields>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+
+		<section class="demo-section">
+			<h2>Email verification</h2>
+			<form>
+				<form-matching-fields>
+					<label for="email-esm">Email</label>
+					<input id="email-esm" type="email" required />
+
+					<label for="email-esm-again">Verify email</label>
+					<input id="email-esm-again" type="email" required />
+				</form-matching-fields>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+
+		<section class="demo-section">
+			<h2>Custom message</h2>
+			<form>
+				<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+					<label for="email-esm-custom">Email</label>
+					<input id="email-esm-custom" type="email" required />
+
+					<label for="email-esm-custom-again">Verify email</label>
+					<input id="email-esm-custom-again" type="email" required />
+				</form-matching-fields>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+
+		<section class="demo-section">
+			<h2>Localized message (Hindi)</h2>
+			<form>
+				<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+					<label for="password-esm-hi">पासवर्ड</label>
+					<input id="password-esm-hi" type="password" required />
+
+					<label for="password-esm-hi-again">पासवर्ड फिर से</label>
+					<input id="password-esm-hi-again" type="password" required />
+				</form-matching-fields>
+				<button type="submit">जमा करें</button>
+			</form>
+		</section>
 
 		<script type="module">
 			import { FormMatchingFieldsElement } from 'https://esm.sh/@aarongustafson/form-matching-fields@0.0.1/form-matching-fields.js?bundle&target=es2022';
@@ -26,6 +77,13 @@
 			if (!customElements.get('form-matching-fields')) {
 				customElements.define('form-matching-fields', FormMatchingFieldsElement);
 			}
+
+			document.querySelectorAll('form').forEach((form) => {
+				form.addEventListener('submit', (event) => {
+					event.preventDefault();
+					form.reportValidity();
+				});
+			});
 		</script>
 	</body>
 </html>

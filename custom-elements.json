@@ -10,9 +10,28 @@
 					"kind": "class",
 					"description": "Web component that automatically adds validation rules that ensure the values of descendent fields match.",
 					"name": "FormMatchingFieldsElement",
-					"members": [],
+					"members": [
+						{
+							"kind": "field",
+							"name": "validationMessage",
+							"privacy": "public",
+							"type": {
+								"text": "string"
+							},
+							"description": "Custom mismatch message template with {label_1} and {label_2} placeholders."
+						}
+					],
 					"events": [],
-					"attributes": [],
+					"attributes": [
+						{
+							"name": "validation-message",
+							"type": {
+								"text": "string"
+							},
+							"default": "The fields \u201c{label_1}\u201d and \u201c{label_2}\u201d should match",
+							"description": "Custom mismatch message template with {label_1} and {label_2} placeholders."
+						}
+					],
 					"superclass": {
 						"name": "HTMLElement"
 					},

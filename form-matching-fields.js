@@ -1,19 +1,28 @@
+const ELIGIBLE_INPUT_TYPES = new Set([
+	'',
+	'text',
+	'email',
+	'password',
+	'search',
+	'tel',
+	'url',
+]);
+
+const DEFAULT_VALIDATION_MESSAGE =
+	'The fields “{label_1}” and “{label_2}” should match';
+
 /**
- * FormMatchingFieldsElement - Web component that automatically adds validation rules that ensure the values of descendent fields match.
+ * Web component that adds match validation for the first two eligible descendent text-type fields.
+ *
+ * Validation is additive and only sets a custom mismatch error when the target field has no
+ * native or pre-existing custom validation errors.
  *
  * @element form-matching-fields
- *
- * @attr {string} example-attribute - Description of the attribute
- *
- * @fires form-matching-fields:event-name - Description of the event
- *
- * @slot - Default slot for content
- *
- * @cssprop --component-name-color - Description of CSS custom property
+ * @attr {string} validation-message - Custom message template with {label_1} and {label_2} placeholders.
  */
 export class FormMatchingFieldsElement extends HTMLElement {
 	static get observedAttributes() {
-		return ['example-attribute'];
+		return ['validation-message'];
 	}
 
 	constructor() {
@@ -21,57 +30,55 @@ export class FormMatchingFieldsElement extends HTMLElement {
 		this.attachShadow({ mode: 'open' });
 		this._internals = {
 			isRendered: false,
+			fields: {
+				first: null,
+				second: null,
+			},
+			lastAppliedMessage: '',
 		};
+
+		this._onFieldInteraction = this._onFieldInteraction.bind(this);
+		this._onMutations = this._onMutations.bind(this);
+		this._mutationObserver = new MutationObserver(this._onMutations);
 	}
 
 	connectedCallback() {
-		requestAnimationFrame(() => {
-			// Upgrade properties that may have been set before the element was defined
-			this._upgradeProperty('exampleAttribute');
+		this._upgradeProperty('validationMessage');
+		this.render();
+		this._refreshFieldBindings();
 
-			// Check for global attributes before setting defaults
-			// Don't override author-set attributes
-			if (!this.hasAttribute('role')) {
-				// this.setAttribute('role', 'group'); // Example - set appropriate role
-			}
-			if (!this.hasAttribute('tabindex')) {
-				// this.setAttribute('tabindex', 0); // Example - set if focusable
-			}
-
-			this.render();
+		this._mutationObserver.observe(this, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: [
+				'type',
+				'disabled',
+				'readonly',
+				'name',
+				'id',
+				'aria-label',
+			],
 		});
 	}
 
+	disconnectedCallback() {
+		this._unbindFieldListeners();
+		this._mutationObserver.disconnect();
+	}
+
 	attributeChangedCallback(name, oldValue, newValue) {
-		// Only handle side effects, avoid full re-render
-		// The property getter will read from the attribute
 		if (oldValue === newValue) {
 			return;
 		}
 
-		switch (name) {
-			case 'example-attribute':
-				// Handle side effects (e.g., update ARIA attributes, dispatch events)
-				// Don't re-render the entire component unless necessary
-				// Example: this.setAttribute('aria-label', newValue);
-
-				// Dispatch events for internal state changes, not for host-set properties
-				// Only dispatch if the change came from internal component activity
-				if (this._internals.isRendered) {
-					// Example pattern (commented out by default):
-					// this.dispatchEvent(new CustomEvent('form-matching-fields:change', {
-					//   detail: { exampleAttribute: newValue },
-					//   bubbles: true,
-					//   composed: true
-					// }));
-				}
-				break;
+		if (name === 'validation-message' && this._internals.isRendered) {
+			this._validateFields();
 		}
 	}
 
 	/**
 	 * Upgrade a property to handle cases where it was set before the element upgraded.
-	 * This is especially important for framework compatibility.
 	 * @param {string} prop - Property name to upgrade
 	 * @private
 	 */
@@ -84,19 +91,20 @@ export class FormMatchingFieldsElement extends HTMLElement {
 	}
 
 	/**
-	 * Example attribute as a property.
-	 * Reflects between property and attribute to keep them in sync.
+	 * Custom mismatch message template.
 	 */
-	get exampleAttribute() {
-		return this.getAttribute('example-attribute');
+	get validationMessage() {
+		return (
+			this.getAttribute('validation-message') ||
+			DEFAULT_VALIDATION_MESSAGE
+		);
 	}
 
-	set exampleAttribute(value) {
-		// Reflect property to attribute
-		if (value === null || value === undefined) {
-			this.removeAttribute('example-attribute');
+	set validationMessage(value) {
+		if (value === null || value === undefined || value === '') {
+			this.removeAttribute('validation-message');
 		} else {
-			this.setAttribute('example-attribute', value);
+			this.setAttribute('validation-message', value);
 		}
 	}
 
@@ -104,10 +112,9 @@ export class FormMatchingFieldsElement extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style>
 				:host {
-					display: block;
+					display: contents;
 				}
 
-				/* Support the hidden attribute properly */
 				:host([hidden]) {
 					display: none;
 				}
@@ -116,5 +123,175 @@ export class FormMatchingFieldsElement extends HTMLElement {
 		`;
 
 		this._internals.isRendered = true;
+	}
+
+	_onMutations() {
+		this._refreshFieldBindings();
+	}
+
+	_onFieldInteraction() {
+		this._validateFields();
+	}
+
+	_refreshFieldBindings() {
+		const nextFields = this._getEligibleFields();
+		const { first, second } = this._internals.fields;
+
+		const hasSameFields =
+			first === nextFields.first && second === nextFields.second;
+
+		if (hasSameFields) {
+			this._validateFields();
+			return;
+		}
+
+		this._unbindFieldListeners();
+		this._internals.fields = nextFields;
+		this._bindFieldListeners();
+		this._validateFields();
+	}
+
+	_getEligibleFields() {
+		const allInputs = Array.from(this.querySelectorAll('input'));
+		const eligible = allInputs.filter((input) =>
+			FormMatchingFieldsElement._isEligibleInput(input),
+		);
+
+		return {
+			first: eligible[0] || null,
+			second: eligible[1] || null,
+		};
+	}
+
+	static _isEligibleInput(input) {
+		if (input.disabled || input.readOnly) {
+			return false;
+		}
+
+		const type = (input.getAttribute('type') || '').toLowerCase();
+		return ELIGIBLE_INPUT_TYPES.has(type);
+	}
+
+	_bindFieldListeners() {
+		const { first, second } = this._internals.fields;
+		if (!first || !second) {
+			return;
+		}
+
+		first.addEventListener('input', this._onFieldInteraction);
+		first.addEventListener('change', this._onFieldInteraction);
+		second.addEventListener('input', this._onFieldInteraction);
+		second.addEventListener('change', this._onFieldInteraction);
+	}
+
+	_unbindFieldListeners() {
+		const { first, second } = this._internals.fields;
+		if (first) {
+			first.removeEventListener('input', this._onFieldInteraction);
+			first.removeEventListener('change', this._onFieldInteraction);
+		}
+
+		if (second) {
+			second.removeEventListener('input', this._onFieldInteraction);
+			second.removeEventListener('change', this._onFieldInteraction);
+		}
+	}
+
+	_validateFields() {
+		const { first, second } = this._internals.fields;
+		if (!first || !second) {
+			return;
+		}
+
+		this._clearOwnMismatchMessage(second);
+
+		const bothNonEmpty = first.value !== '' && second.value !== '';
+		if (!bothNonEmpty) {
+			return;
+		}
+
+		const isMismatch = first.value !== second.value;
+		if (!isMismatch) {
+			return;
+		}
+
+		if (
+			second.validity.customError ||
+			FormMatchingFieldsElement._hasNativeConstraintError(second)
+		) {
+			return;
+		}
+
+		const mismatchMessage = this._formatValidationMessage(first, second);
+		second.setCustomValidity(mismatchMessage);
+		this._internals.lastAppliedMessage = mismatchMessage;
+	}
+
+	_clearOwnMismatchMessage(second) {
+		if (!this._internals.lastAppliedMessage) {
+			return;
+		}
+
+		if (
+			second.validity.customError &&
+			second.validationMessage === this._internals.lastAppliedMessage
+		) {
+			second.setCustomValidity('');
+		}
+
+		this._internals.lastAppliedMessage = '';
+	}
+
+	static _hasNativeConstraintError(field) {
+		const validity = field.validity;
+		return (
+			validity.valueMissing ||
+			validity.typeMismatch ||
+			validity.patternMismatch ||
+			validity.tooLong ||
+			validity.tooShort ||
+			validity.rangeUnderflow ||
+			validity.rangeOverflow ||
+			validity.stepMismatch ||
+			validity.badInput
+		);
+	}
+
+	_formatValidationMessage(first, second) {
+		const label1 =
+			FormMatchingFieldsElement._getFieldLabel(first) || 'Field 1';
+		const label2 =
+			FormMatchingFieldsElement._getFieldLabel(second) || 'Field 2';
+
+		return this.validationMessage
+			.replaceAll('{label_1}', label1)
+			.replaceAll('{label_2}', label2);
+	}
+
+	static _getFieldLabel(field) {
+		const directLabel = field.labels?.[0]?.textContent?.trim();
+		if (directLabel) {
+			return directLabel;
+		}
+
+		const wrappingLabel = field.closest('label')?.textContent?.trim();
+		if (wrappingLabel) {
+			return wrappingLabel;
+		}
+
+		const ariaLabel = field.getAttribute('aria-label')?.trim();
+		if (ariaLabel) {
+			return ariaLabel;
+		}
+
+		if (field.name) {
+			return field.name;
+		}
+
+		if (field.id) {
+			return field.id;
+		}
+
+		return '';
 	}
 }

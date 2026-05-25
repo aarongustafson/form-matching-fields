@@ -13,53 +13,131 @@
 		<header>
 			<h1>&lt;form-matching-fields&gt;</h1>
 			<p>
-				Web component that automatically adds validation rules that ensure the values of descendent fields match. See the
+				Web component wrapper for matching two text-type fields. See the
 				<a
 					href="https://github.com/aarongustafson/form-matching-fields/blob/main/README.md"
 					>README</a
 				>
-				for installation and API documentation.
+				for installation details and API documentation.
 			</p>
 		</header>
 
 		<main>
-			<!-- Basic Example -->
 			<section>
-				<h2>Basic Example</h2>
-				<p>A simple demonstration of the component.</p>
+				<h2>Password Confirmation</h2>
+				<p>Default validation message with required fields.</p>
 
 				<div class="demo-section">
-					<h3>Basic Usage</h3>
-					<p>Description of this example.</p>
+					<h3>Password + Password again</h3>
 					<div class="code-demo-pair">
 						<pre><code>&lt;form-matching-fields&gt;
-  &lt;p&gt;Content goes here&lt;/p&gt;
+  &lt;label for="password"&gt;Password&lt;/label&gt;
+  &lt;input id="password" type="password" required /&gt;
+
+  &lt;label for="password-again"&gt;Password again&lt;/label&gt;
+  &lt;input id="password-again" type="password" required /&gt;
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
-							<form-matching-fields>
-								<p>Content goes here</p>
-							</form-matching-fields>
+							<form>
+								<form-matching-fields>
+									<label for="password">Password</label>
+									<input id="password" type="password" required />
+
+									<label for="password-again">Password again</label>
+									<input id="password-again" type="password" required />
+								</form-matching-fields>
+								<button type="submit">Submit</button>
+							</form>
 						</div>
 					</div>
 				</div>
 			</section>
 
-			<!-- Example with Attributes -->
 			<section>
-				<h2>Example with Attributes</h2>
-				<p>Demonstrating component attributes.</p>
+				<h2>Email Verification</h2>
+				<p>Validation works with other text-like types such as email.</p>
 
 				<div class="demo-section">
-					<h3>Using Attributes</h3>
-					<p>Description of this example with attributes.</p>
+					<h3>Email + Verify email</h3>
 					<div class="code-demo-pair">
-						<pre><code>&lt;form-matching-fields example-attribute="value"&gt;
-  &lt;p&gt;Content with attributes&lt;/p&gt;
+ 						<pre><code>&lt;form-matching-fields&gt;
+  &lt;label for="email"&gt;Email&lt;/label&gt;
+  &lt;input id="email" type="email" required /&gt;
+
+  &lt;label for="email-again"&gt;Verify email&lt;/label&gt;
+  &lt;input id="email-again" type="email" required /&gt;
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
-							<form-matching-fields example-attribute="value">
-								<p>Content with attributes</p>
-							</form-matching-fields>
+							<form>
+								<form-matching-fields>
+									<label for="email">Email</label>
+									<input id="email" type="email" required />
+
+									<label for="email-again">Verify email</label>
+									<input id="email-again" type="email" required />
+								</form-matching-fields>
+								<button type="submit">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section>
+				<h2>Custom Message</h2>
+				<p>Override the default text using the validation-message attribute.</p>
+
+				<div class="demo-section">
+					<h3>Custom mismatch copy</h3>
+					<div class="code-demo-pair">
+						<pre><code>&lt;form-matching-fields validation-message="Please make sure {label_2} matches {label_1}."&gt;
+  &lt;label for="email-custom"&gt;Email&lt;/label&gt;
+  &lt;input id="email-custom" type="email" required /&gt;
+
+  &lt;label for="email-custom-again"&gt;Verify email&lt;/label&gt;
+  &lt;input id="email-custom-again" type="email" required /&gt;
+&lt;/form-matching-fields&gt;</code></pre>
+						<div class="demo">
+							<form>
+								<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+									<label for="email-custom">Email</label>
+									<input id="email-custom" type="email" required />
+
+									<label for="email-custom-again">Verify email</label>
+									<input id="email-custom-again" type="email" required />
+								</form-matching-fields>
+								<button type="submit">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section>
+				<h2>Localized Message (Hindi)</h2>
+				<p>Localization is just custom content with placeholders.</p>
+
+				<div class="demo-section">
+					<h3>Hindi validation message</h3>
+					<div class="code-demo-pair">
+						<pre><code>&lt;form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"&gt;
+  &lt;label for="password-hi"&gt;पासवर्ड&lt;/label&gt;
+  &lt;input id="password-hi" type="password" required /&gt;
+
+  &lt;label for="password-hi-again"&gt;पासवर्ड फिर से&lt;/label&gt;
+  &lt;input id="password-hi-again" type="password" required /&gt;
+&lt;/form-matching-fields&gt;</code></pre>
+						<div class="demo">
+							<form>
+								<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+									<label for="password-hi">पासवर्ड</label>
+									<input id="password-hi" type="password" required />
+
+									<label for="password-hi-again">पासवर्ड फिर से</label>
+									<input id="password-hi-again" type="password" required />
+								</form-matching-fields>
+								<button type="submit">जमा करें</button>
+							</form>
 						</div>
 					</div>
 				</div>
@@ -69,7 +147,7 @@
 			<section class="api-reference">
 				<h2>API Reference</h2>
 				<p>
-					For complete documentation of attributes, events, and
+					For complete documentation of behavior and
 					browser support, see the
 					<a
 						href="https://github.com/aarongustafson/form-matching-fields/blob/main/README.md"
@@ -89,6 +167,15 @@
 				>.
 			</p>
 		</footer>
+
+		<script>
+			document.querySelectorAll('form').forEach((form) => {
+				form.addEventListener('submit', (event) => {
+					event.preventDefault();
+					form.reportValidity();
+				});
+			});
+		</script>
 
 		<script src="../define.js" type="module"></script>
 	</body>

@@ -3,13 +3,7 @@
  *
  * @element form-matching-fields
  *
- * @attr {string} example-attribute - Description of the attribute
- *
- * @fires form-matching-fields:event-name - Description of the event
- *
- * @slot - Default slot for content
- *
- * @cssprop --component-name-color - Description of CSS custom property
+ * @attr {string} validation-message - Custom message template with {label_1} and {label_2} placeholders.
  */
 export class FormMatchingFieldsElement extends HTMLElement {
 	/**
@@ -22,7 +16,14 @@ export class FormMatchingFieldsElement extends HTMLElement {
 	 */
 	private readonly _internals: {
 		isRendered: boolean;
+		fields: {
+			first: HTMLInputElement | null;
+			second: HTMLInputElement | null;
+		};
+		lastAppliedMessage: string;
 	};
+
+	private readonly _mutationObserver: MutationObserver;
 
 	constructor();
 
@@ -30,6 +31,11 @@ export class FormMatchingFieldsElement extends HTMLElement {
 	 * Called when the element is connected to the DOM
 	 */
 	connectedCallback(): void;
+
+	/**
+	 * Called when the element is disconnected from the DOM
+	 */
+	disconnectedCallback(): void;
 
 	/**
 	 * Called when an observed attribute changes
@@ -52,14 +58,32 @@ export class FormMatchingFieldsElement extends HTMLElement {
 	private _upgradeProperty(prop: string): void;
 
 	/**
-	 * Example attribute as a property.
-	 * Reflects between property and attribute to keep them in sync.
+	 * Custom mismatch validation message template.
 	 */
-	get exampleAttribute(): string | null;
-	set exampleAttribute(value: string | null | undefined);
+	get validationMessage(): string;
+	set validationMessage(value: string | null | undefined);
 
 	/**
 	 * Renders the component's shadow DOM content
 	 */
 	render(): void;
+
+	private _onMutations(): void;
+	private _onFieldInteraction(): void;
+	private _refreshFieldBindings(): void;
+	private _getEligibleFields(): {
+		first: HTMLInputElement | null;
+		second: HTMLInputElement | null;
+	};
+	private static _isEligibleInput(input: HTMLInputElement): boolean;
+	private _bindFieldListeners(): void;
+	private _unbindFieldListeners(): void;
+	private _validateFields(): void;
+	private _clearOwnMismatchMessage(second: HTMLInputElement): void;
+	private static _hasNativeConstraintError(field: HTMLInputElement): boolean;
+	private _formatValidationMessage(
+		first: HTMLInputElement,
+		second: HTMLInputElement,
+	): string;
+	private static _getFieldLabel(field: HTMLInputElement): string;
 }
