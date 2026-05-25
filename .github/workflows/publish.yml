@@ -38,10 +38,15 @@ jobs:
       - name: Run tests
         run: npm run test:run
 
+      - name: Check npm access and config
+        run: |
+          npm whoami || echo 'Not authenticated'
+          npm config list | grep -E 'registry|@aarongustafson'
+
       - name: Dry-run npm publish
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode != 'publish'
         run: npm publish --dry-run --access public
 
       - name: Publish to npm
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode == 'publish')
-        run: npm publish
+        run: npm publish --provenance --access public
