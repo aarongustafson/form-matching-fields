@@ -1,6 +1,6 @@
 {
 	"name": "@aarongustafson/form-matching-fields",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "Web component that automatically adds validation rules that ensure the values of descendent fields match.",
 	"keywords": [
 		"html",
