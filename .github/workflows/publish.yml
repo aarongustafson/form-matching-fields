@@ -29,19 +29,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "22.x"
+          node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Show toolchain versions
+        run: |
+          node --version
+          npm --version
 
       - name: Run tests
         run: npm run test:run
 
       - name: Check npm access and config
         run: |
-          npm whoami || echo 'Not authenticated'
+          npm whoami || echo 'No npm token session (expected for OIDC trusted publishing)'
           npm config list | grep -E 'registry|@aarongustafson'
+
+      - name: Show npm package metadata
+        run: |
+          echo "Local package version: $(node -p \"require('./package.json').version\")"
+          echo "Published package metadata:"
+          npm view @aarongustafson/form-matching-fields version dist-tags maintainers --json || true
 
       - name: Dry-run npm publish
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode != 'publish'
