@@ -4,6 +4,16 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      publish_mode:
+        description: "Choose dry-run for testing or publish to release"
+        required: true
+        default: "dry-run"
+        type: choice
+        options:
+          - dry-run
+          - publish
 
 permissions:
   id-token: write # Required for OIDC
@@ -29,5 +39,10 @@ jobs:
       - name: Run tests
         run: npm run test:run
 
+      - name: Dry-run npm publish
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode != 'publish'
+        run: npm publish --dry-run --access public
+
       - name: Publish to npm
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode == 'publish')
         run: npm publish --provenance --access public
