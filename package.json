@@ -1,7 +1,7 @@
 {
-	"name": "@aarongustafson/COMPONENT-NAME",
+	"name": "@aarongustafson/form-matching-fields",
 	"version": "0.0.1",
-	"description": "COMPONENT_DESCRIPTION",
+	"description": "Web component that automatically adds validation rules that ensure the values of descendent fields match.",
 	"keywords": [
 		"html",
 		"custom element",
@@ -9,26 +9,26 @@
 	],
 	"author": "Aaron Gustafson <aaron@easy-designs.net> (https://www.aaron-gustafson.com/)",
 	"license": "MIT",
-	"homepage": "https://github.com/aarongustafson/COMPONENT-NAME#readme",
+	"homepage": "https://github.com/aarongustafson/form-matching-fields#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/aarongustafson/COMPONENT-NAME.git"
+		"url": "git+https://github.com/aarongustafson/form-matching-fields.git"
 	},
 	"bugs": {
-		"url": "https://github.com/aarongustafson/COMPONENT-NAME/issues"
+		"url": "https://github.com/aarongustafson/form-matching-fields/issues"
 	},
 	"type": "module",
 	"main": "index.js",
-	"module": "COMPONENT-NAME.js",
+	"module": "form-matching-fields.js",
 	"customElements": "custom-elements.json",
-	"types": "COMPONENT-NAME.d.ts",
+	"types": "form-matching-fields.d.ts",
 	"exports": {
 		".": {
 			"import": "./index.js"
 		},
-		"./COMPONENT-NAME.js": {
-			"types": "./COMPONENT-NAME.d.ts",
-			"import": "./COMPONENT-NAME.js"
+		"./form-matching-fields.js": {
+			"types": "./form-matching-fields.d.ts",
+			"import": "./form-matching-fields.js"
 		},
 		"./define.js": {
 			"import": "./define.js"
@@ -36,8 +36,8 @@
 		"./custom-elements.json": "./custom-elements.json"
 	},
 	"files": [
-		"COMPONENT-NAME.js",
-		"COMPONENT-NAME.d.ts",
+		"form-matching-fields.js",
+		"form-matching-fields.d.ts",
 		"define.js",
 		"index.js",
 		"custom-elements.json",

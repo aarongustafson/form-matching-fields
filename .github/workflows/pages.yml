@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "demo/**"
-      - "COMPONENT-NAME.js"
+      - "form-matching-fields.js"
       - "define.js"
       - "index.js"
       - "README.md"

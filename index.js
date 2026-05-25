@@ -1,1 +1,1 @@
-export { ComponentNameElement } from './COMPONENT-NAME.js';
+export { FormMatchingFieldsElement } from './form-matching-fields.js';

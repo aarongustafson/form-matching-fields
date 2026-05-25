@@ -1,17 +1,17 @@
 /**
- * ComponentNameElement - COMPONENT_DESCRIPTION
+ * FormMatchingFieldsElement - Web component that automatically adds validation rules that ensure the values of descendent fields match.
  *
- * @element COMPONENT-NAME
+ * @element form-matching-fields
  *
  * @attr {string} example-attribute - Description of the attribute
  *
- * @fires COMPONENT-NAME:event-name - Description of the event
+ * @fires form-matching-fields:event-name - Description of the event
  *
  * @slot - Default slot for content
  *
  * @cssprop --component-name-color - Description of CSS custom property
  */
-export class ComponentNameElement extends HTMLElement {
+export class FormMatchingFieldsElement extends HTMLElement {
 	/**
 	 * List of attributes to observe for changes
 	 */
