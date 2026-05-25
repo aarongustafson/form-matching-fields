@@ -43,20 +43,6 @@ jobs:
       - name: Run tests
         run: npm run test:run
 
-      - name: Check npm access and config
-        run: |
-          npm whoami || echo 'No npm token session (expected for OIDC trusted publishing)'
-          npm config list | grep -E 'registry|@aarongustafson'
-
-      - name: Show npm package metadata
-        run: |
-          LOCAL_PACKAGE_VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
-          echo "Local package version: ${LOCAL_PACKAGE_VERSION}"
-          echo "Published package metadata:"
-          npm view @aarongustafson/form-matching-fields version dist-tags maintainers --json || true
-        env:
-          NODE_AUTH_TOKEN: ""
-
       - name: Dry-run npm publish
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode != 'publish'
         run: npm publish --dry-run --access public
