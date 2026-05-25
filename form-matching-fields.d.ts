@@ -20,7 +20,14 @@ export class FormMatchingFieldsElement extends HTMLElement {
 			first: HTMLInputElement | null;
 			second: HTMLInputElement | null;
 		};
+		labels: {
+			first: string;
+			second: string;
+		};
 		lastAppliedMessage: string;
+		mutationWorkScheduled: boolean;
+		needsFieldRefresh: boolean;
+		needsLabelRefresh: boolean;
 	};
 
 	private readonly _mutationObserver: MutationObserver;
@@ -69,21 +76,19 @@ export class FormMatchingFieldsElement extends HTMLElement {
 	render(): void;
 
 	private _onMutations(): void;
-	private _onFieldInteraction(): void;
+	private _onFieldInteraction(event: Event): void;
+	private _scheduleMutationWork(): void;
 	private _refreshFieldBindings(): void;
 	private _getEligibleFields(): {
 		first: HTMLInputElement | null;
 		second: HTMLInputElement | null;
 	};
+	private _cacheFieldLabels(): void;
 	private static _isEligibleInput(input: HTMLInputElement): boolean;
-	private _bindFieldListeners(): void;
-	private _unbindFieldListeners(): void;
 	private _validateFields(): void;
+	private _hasOwnMismatchMessage(second: HTMLInputElement): boolean;
 	private _clearOwnMismatchMessage(second: HTMLInputElement): void;
 	private static _hasNativeConstraintError(field: HTMLInputElement): boolean;
-	private _formatValidationMessage(
-		first: HTMLInputElement,
-		second: HTMLInputElement,
-	): string;
+	private _formatValidationMessage(): string;
 	private static _getFieldLabel(field: HTMLInputElement): string;
 }

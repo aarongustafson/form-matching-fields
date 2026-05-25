@@ -34,7 +34,14 @@ export class FormMatchingFieldsElement extends HTMLElement {
 				first: null,
 				second: null,
 			},
+			labels: {
+				first: 'Field 1',
+				second: 'Field 2',
+			},
 			lastAppliedMessage: '',
+			mutationWorkScheduled: false,
+			needsFieldRefresh: false,
+			needsLabelRefresh: false,
 		};
 
 		this._onFieldInteraction = this._onFieldInteraction.bind(this);
@@ -46,10 +53,13 @@ export class FormMatchingFieldsElement extends HTMLElement {
 		this._upgradeProperty('validationMessage');
 		this.render();
 		this._refreshFieldBindings();
+		this.addEventListener('input', this._onFieldInteraction);
+		this.addEventListener('change', this._onFieldInteraction);
 
 		this._mutationObserver.observe(this, {
 			childList: true,
 			subtree: true,
+			characterData: true,
 			attributes: true,
 			attributeFilter: [
 				'type',
@@ -58,12 +68,14 @@ export class FormMatchingFieldsElement extends HTMLElement {
 				'name',
 				'id',
 				'aria-label',
+				'for',
 			],
 		});
 	}
 
 	disconnectedCallback() {
-		this._unbindFieldListeners();
+		this.removeEventListener('input', this._onFieldInteraction);
+		this.removeEventListener('change', this._onFieldInteraction);
 		this._mutationObserver.disconnect();
 	}
 
@@ -126,11 +138,47 @@ export class FormMatchingFieldsElement extends HTMLElement {
 	}
 
 	_onMutations() {
-		this._refreshFieldBindings();
+		this._internals.needsFieldRefresh = true;
+		this._internals.needsLabelRefresh = true;
+		this._scheduleMutationWork();
 	}
 
-	_onFieldInteraction() {
+	_onFieldInteraction(event) {
+		const target = event.target;
+		if (!(target instanceof HTMLInputElement)) {
+			return;
+		}
+
+		const { first, second } = this._internals.fields;
+		if (target !== first && target !== second) {
+			return;
+		}
+
 		this._validateFields();
+	}
+
+	_scheduleMutationWork() {
+		if (this._internals.mutationWorkScheduled) {
+			return;
+		}
+
+		this._internals.mutationWorkScheduled = true;
+		queueMicrotask(() => {
+			this._internals.mutationWorkScheduled = false;
+
+			if (this._internals.needsFieldRefresh) {
+				this._internals.needsFieldRefresh = false;
+				this._internals.needsLabelRefresh = false;
+				this._refreshFieldBindings();
+				return;
+			}
+
+			if (this._internals.needsLabelRefresh) {
+				this._internals.needsLabelRefresh = false;
+				this._cacheFieldLabels();
+				this._validateFields();
+			}
+		});
 	}
 
 	_refreshFieldBindings() {
@@ -141,25 +189,54 @@ export class FormMatchingFieldsElement extends HTMLElement {
 			first === nextFields.first && second === nextFields.second;
 
 		if (hasSameFields) {
+			this._cacheFieldLabels();
 			this._validateFields();
 			return;
 		}
 
-		this._unbindFieldListeners();
+		if (second) {
+			this._clearOwnMismatchMessage(second);
+		}
+
 		this._internals.fields = nextFields;
-		this._bindFieldListeners();
+		this._cacheFieldLabels();
 		this._validateFields();
 	}
 
 	_getEligibleFields() {
-		const allInputs = Array.from(this.querySelectorAll('input'));
-		const eligible = allInputs.filter((input) =>
-			FormMatchingFieldsElement._isEligibleInput(input),
-		);
+		const walker = document.createTreeWalker(this, NodeFilter.SHOW_ELEMENT);
+		let first = null;
+		let second = null;
+
+		let node = walker.nextNode();
+		while (node) {
+			if (
+				node instanceof HTMLInputElement &&
+				FormMatchingFieldsElement._isEligibleInput(node)
+			) {
+				if (!first) {
+					first = node;
+				} else {
+					second = node;
+					break;
+				}
+			}
+
+			node = walker.nextNode();
+		}
 
 		return {
-			first: eligible[0] || null,
-			second: eligible[1] || null,
+			first,
+			second,
+		};
+	}
+
+	_cacheFieldLabels() {
+		const { first, second } = this._internals.fields;
+		this._internals.labels = {
+			first: FormMatchingFieldsElement._getFieldLabel(first) || 'Field 1',
+			second:
+				FormMatchingFieldsElement._getFieldLabel(second) || 'Field 2',
 		};
 	}
 
@@ -172,72 +249,68 @@ export class FormMatchingFieldsElement extends HTMLElement {
 		return ELIGIBLE_INPUT_TYPES.has(type);
 	}
 
-	_bindFieldListeners() {
-		const { first, second } = this._internals.fields;
-		if (!first || !second) {
-			return;
-		}
-
-		first.addEventListener('input', this._onFieldInteraction);
-		first.addEventListener('change', this._onFieldInteraction);
-		second.addEventListener('input', this._onFieldInteraction);
-		second.addEventListener('change', this._onFieldInteraction);
-	}
-
-	_unbindFieldListeners() {
-		const { first, second } = this._internals.fields;
-		if (first) {
-			first.removeEventListener('input', this._onFieldInteraction);
-			first.removeEventListener('change', this._onFieldInteraction);
-		}
-
-		if (second) {
-			second.removeEventListener('input', this._onFieldInteraction);
-			second.removeEventListener('change', this._onFieldInteraction);
-		}
-	}
-
 	_validateFields() {
 		const { first, second } = this._internals.fields;
 		if (!first || !second) {
+			this._internals.lastAppliedMessage = '';
 			return;
 		}
 
-		this._clearOwnMismatchMessage(second);
+		const hasOwnMismatch = this._hasOwnMismatchMessage(second);
 
 		const bothNonEmpty = first.value !== '' && second.value !== '';
 		if (!bothNonEmpty) {
+			if (hasOwnMismatch) {
+				this._clearOwnMismatchMessage(second);
+			}
 			return;
 		}
 
 		const isMismatch = first.value !== second.value;
 		if (!isMismatch) {
+			if (hasOwnMismatch) {
+				this._clearOwnMismatchMessage(second);
+			}
 			return;
 		}
+
+		const hasExternalCustomError =
+			second.validity.customError && !hasOwnMismatch;
 
 		if (
-			second.validity.customError ||
+			hasExternalCustomError ||
 			FormMatchingFieldsElement._hasNativeConstraintError(second)
 		) {
+			if (hasOwnMismatch) {
+				this._clearOwnMismatchMessage(second);
+			}
 			return;
 		}
 
-		const mismatchMessage = this._formatValidationMessage(first, second);
+		const mismatchMessage = this._formatValidationMessage();
+		if (hasOwnMismatch && second.validationMessage === mismatchMessage) {
+			return;
+		}
+
 		second.setCustomValidity(mismatchMessage);
 		this._internals.lastAppliedMessage = mismatchMessage;
 	}
 
+	_hasOwnMismatchMessage(second) {
+		return (
+			Boolean(this._internals.lastAppliedMessage) &&
+			second.validity.customError &&
+			second.validationMessage === this._internals.lastAppliedMessage
+		);
+	}
+
 	_clearOwnMismatchMessage(second) {
-		if (!this._internals.lastAppliedMessage) {
+		if (!this._hasOwnMismatchMessage(second)) {
+			this._internals.lastAppliedMessage = '';
 			return;
 		}
 
-		if (
-			second.validity.customError &&
-			second.validationMessage === this._internals.lastAppliedMessage
-		) {
-			second.setCustomValidity('');
-		}
+		second.setCustomValidity('');
 
 		this._internals.lastAppliedMessage = '';
 	}
@@ -257,11 +330,10 @@ export class FormMatchingFieldsElement extends HTMLElement {
 		);
 	}
 
-	_formatValidationMessage(first, second) {
-		const label1 =
-			FormMatchingFieldsElement._getFieldLabel(first) || 'Field 1';
-		const label2 =
-			FormMatchingFieldsElement._getFieldLabel(second) || 'Field 2';
+	_formatValidationMessage() {
+		const { labels } = this._internals;
+		const label1 = labels.first || 'Field 1';
+		const label2 = labels.second || 'Field 2';
 
 		return this.validationMessage
 			.replaceAll('{label_1}', label1)
@@ -269,6 +341,10 @@ export class FormMatchingFieldsElement extends HTMLElement {
 	}
 
 	static _getFieldLabel(field) {
+		if (!field) {
+			return '';
+		}
+
 		const directLabel = field.labels?.[0]?.textContent?.trim();
 		if (directLabel) {
 			return directLabel;
