@@ -50,14 +50,21 @@ jobs:
 
       - name: Show npm package metadata
         run: |
-          echo "Local package version: $(node -p \"require('./package.json').version\")"
+          LOCAL_PACKAGE_VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
+          echo "Local package version: ${LOCAL_PACKAGE_VERSION}"
           echo "Published package metadata:"
           npm view @aarongustafson/form-matching-fields version dist-tags maintainers --json || true
+        env:
+          NODE_AUTH_TOKEN: ""
 
       - name: Dry-run npm publish
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode != 'publish'
         run: npm publish --dry-run --access public
+        env:
+          NODE_AUTH_TOKEN: ""
 
       - name: Publish to npm
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode == 'publish')
         run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ""
