@@ -9,6 +9,7 @@ Web component wrapper that adds additive validation to ensure two text-type fiel
 [Live Demo](https://aarongustafson.github.io/form-matching-fields/demo/) ([Source](./demo/index.html))
 
 Additional demos:
+
 - [ESM CDN Demo](https://aarongustafson.github.io/form-matching-fields/demo/esm.html) ([Source](./demo/esm.html))
 - [Unpkg CDN Demo](https://aarongustafson.github.io/form-matching-fields/demo/unpkg.html) ([Source](./demo/unpkg.html))
 
@@ -31,7 +32,10 @@ import '@aarongustafson/form-matching-fields';
 Or use the define-only script in HTML:
 
 ```html
-<script src="./node_modules/@aarongustafson/form-matching-fields/define.js" type="module"></script>
+<script
+  src="./node_modules/@aarongustafson/form-matching-fields/define.js"
+  type="module"
+></script>
 ```
 
 ### Option 2: Import the class and define manually
@@ -77,14 +81,14 @@ The component does not replace native or existing custom validation:
 
 ## Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
+| Attribute            | Type     | Default                                               | Description                                                                                         |
+| -------------------- | -------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `validation-message` | `string` | `The fields “{label_1}” and “{label_2}” should match` | Custom mismatch message template. Supports placeholder replacement for `{label_1}` and `{label_2}`. |
 
 ## Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
+| Property            | Type     | Description                                  |
+| ------------------- | -------- | -------------------------------------------- |
 | `validationMessage` | `string` | Property equivalent of `validation-message`. |
 
 ## Message Label Resolution
@@ -114,7 +118,9 @@ When replacing `{label_1}` and `{label_2}`, labels are resolved in this order:
 ### Custom Validation Message
 
 ```html
-<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+<form-matching-fields
+  validation-message="Please make sure {label_2} matches {label_1}."
+>
   <label for="email">Email</label>
   <input id="email" type="email" required />
 
@@ -126,7 +132,9 @@ When replacing `{label_1}` and `{label_2}`, labels are resolved in this order:
 ### Localized (Hindi) Message
 
 ```html
-<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+<form-matching-fields
+  validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"
+>
   <label for="password-hi">पासवर्ड</label>
   <input id="password-hi" type="password" required />
 
@@ -138,6 +146,7 @@ When replacing `{label_1}` and `{label_2}`, labels are resolved in this order:
 ## Browser Support
 
 This component uses modern web standards:
+
 - Custom Elements v1
 - Shadow DOM v1
 - ES Modules

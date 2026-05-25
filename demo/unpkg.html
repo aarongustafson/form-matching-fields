@@ -47,12 +47,18 @@
 		<section class="demo-section">
 			<h2>Custom message</h2>
 			<form>
-				<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+				<form-matching-fields
+					validation-message="Please make sure {label_2} matches {label_1}."
+				>
 					<label for="email-unpkg-custom">Email</label>
 					<input id="email-unpkg-custom" type="email" required />
 
 					<label for="email-unpkg-custom-again">Verify email</label>
-					<input id="email-unpkg-custom-again" type="email" required />
+					<input
+						id="email-unpkg-custom-again"
+						type="email"
+						required
+					/>
 				</form-matching-fields>
 				<button type="submit">Submit</button>
 			</form>
@@ -61,12 +67,18 @@
 		<section class="demo-section">
 			<h2>Localized message (Hindi)</h2>
 			<form>
-				<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+				<form-matching-fields
+					validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"
+				>
 					<label for="password-unpkg-hi">पासवर्ड</label>
 					<input id="password-unpkg-hi" type="password" required />
 
 					<label for="password-unpkg-hi-again">पासवर्ड फिर से</label>
-					<input id="password-unpkg-hi-again" type="password" required />
+					<input
+						id="password-unpkg-hi-again"
+						type="password"
+						required
+					/>
 				</form-matching-fields>
 				<button type="submit">जमा करें</button>
 			</form>

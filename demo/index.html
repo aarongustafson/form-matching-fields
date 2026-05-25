@@ -41,10 +41,20 @@
 							<form>
 								<form-matching-fields>
 									<label for="password">Password</label>
-									<input id="password" type="password" required />
+									<input
+										id="password"
+										type="password"
+										required
+									/>
 
-									<label for="password-again">Password again</label>
-									<input id="password-again" type="password" required />
+									<label for="password-again"
+										>Password again</label
+									>
+									<input
+										id="password-again"
+										type="password"
+										required
+									/>
 								</form-matching-fields>
 								<button type="submit">Submit</button>
 							</form>
@@ -55,12 +65,14 @@
 
 			<section>
 				<h2>Email Verification</h2>
-				<p>Validation works with other text-like types such as email.</p>
+				<p>
+					Validation works with other text-like types such as email.
+				</p>
 
 				<div class="demo-section">
 					<h3>Email + Verify email</h3>
 					<div class="code-demo-pair">
- 						<pre><code>&lt;form-matching-fields&gt;
+						<pre><code>&lt;form-matching-fields&gt;
   &lt;label for="email"&gt;Email&lt;/label&gt;
   &lt;input id="email" type="email" required /&gt;
 
@@ -73,8 +85,14 @@
 									<label for="email">Email</label>
 									<input id="email" type="email" required />
 
-									<label for="email-again">Verify email</label>
-									<input id="email-again" type="email" required />
+									<label for="email-again"
+										>Verify email</label
+									>
+									<input
+										id="email-again"
+										type="email"
+										required
+									/>
 								</form-matching-fields>
 								<button type="submit">Submit</button>
 							</form>
@@ -85,7 +103,10 @@
 
 			<section>
 				<h2>Custom Message</h2>
-				<p>Override the default text using the validation-message attribute.</p>
+				<p>
+					Override the default text using the validation-message
+					attribute.
+				</p>
 
 				<div class="demo-section">
 					<h3>Custom mismatch copy</h3>
@@ -99,12 +120,24 @@
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
 							<form>
-								<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+								<form-matching-fields
+									validation-message="Please make sure {label_2} matches {label_1}."
+								>
 									<label for="email-custom">Email</label>
-									<input id="email-custom" type="email" required />
+									<input
+										id="email-custom"
+										type="email"
+										required
+									/>
 
-									<label for="email-custom-again">Verify email</label>
-									<input id="email-custom-again" type="email" required />
+									<label for="email-custom-again"
+										>Verify email</label
+									>
+									<input
+										id="email-custom-again"
+										type="email"
+										required
+									/>
 								</form-matching-fields>
 								<button type="submit">Submit</button>
 							</form>
@@ -129,12 +162,24 @@
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
 							<form>
-								<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+								<form-matching-fields
+									validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"
+								>
 									<label for="password-hi">पासवर्ड</label>
-									<input id="password-hi" type="password" required />
+									<input
+										id="password-hi"
+										type="password"
+										required
+									/>
 
-									<label for="password-hi-again">पासवर्ड फिर से</label>
-									<input id="password-hi-again" type="password" required />
+									<label for="password-hi-again"
+										>पासवर्ड फिर से</label
+									>
+									<input
+										id="password-hi-again"
+										type="password"
+										required
+									/>
 								</form-matching-fields>
 								<button type="submit">जमा करें</button>
 							</form>
@@ -147,8 +192,8 @@
 			<section class="api-reference">
 				<h2>API Reference</h2>
 				<p>
-					For complete documentation of behavior and
-					browser support, see the
+					For complete documentation of behavior and browser support,
+					see the
 					<a
 						href="https://github.com/aarongustafson/form-matching-fields/blob/main/README.md"
 						>README</a

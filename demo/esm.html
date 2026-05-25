@@ -12,7 +12,8 @@
 	<body>
 		<h1>form-matching-fields via esm.sh</h1>
 		<p>
-			This page loads the component class from <code>esm.sh</code> and registers it manually.
+			This page loads the component class from <code>esm.sh</code> and
+			registers it manually.
 		</p>
 
 		<section class="demo-section">
@@ -46,7 +47,9 @@
 		<section class="demo-section">
 			<h2>Custom message</h2>
 			<form>
-				<form-matching-fields validation-message="Please make sure {label_2} matches {label_1}.">
+				<form-matching-fields
+					validation-message="Please make sure {label_2} matches {label_1}."
+				>
 					<label for="email-esm-custom">Email</label>
 					<input id="email-esm-custom" type="email" required />
 
@@ -60,12 +63,18 @@
 		<section class="demo-section">
 			<h2>Localized message (Hindi)</h2>
 			<form>
-				<form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।">
+				<form-matching-fields
+					validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"
+				>
 					<label for="password-esm-hi">पासवर्ड</label>
 					<input id="password-esm-hi" type="password" required />
 
 					<label for="password-esm-hi-again">पासवर्ड फिर से</label>
-					<input id="password-esm-hi-again" type="password" required />
+					<input
+						id="password-esm-hi-again"
+						type="password"
+						required
+					/>
 				</form-matching-fields>
 				<button type="submit">जमा करें</button>
 			</form>
@@ -75,7 +84,10 @@
 			import { FormMatchingFieldsElement } from 'https://esm.sh/@aarongustafson/form-matching-fields@0.0.1/form-matching-fields.js?bundle&target=es2022';
 
 			if (!customElements.get('form-matching-fields')) {
-				customElements.define('form-matching-fields', FormMatchingFieldsElement);
+				customElements.define(
+					'form-matching-fields',
+					FormMatchingFieldsElement,
+				);
 			}
 
 			document.querySelectorAll('form').forEach((form) => {
