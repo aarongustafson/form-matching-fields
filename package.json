@@ -24,6 +24,7 @@
 	"types": "form-matching-fields.d.ts",
 	"exports": {
 		".": {
+			"types": "./form-matching-fields.d.ts",
 			"import": "./index.js"
 		},
 		"./form-matching-fields.js": {
@@ -48,7 +49,6 @@
 		"node": ">=22.0.0"
 	},
 	"scripts": {
-		"setup": "node scripts/setup.js",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
 		"test:run": "vitest run",

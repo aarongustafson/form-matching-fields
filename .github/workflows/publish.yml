@@ -32,13 +32,17 @@ jobs:
           node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Verify tag matches package version
+        if: github.event_name == 'push'
+        run: |
+          expected_tag="v$(node -p "require('./package.json').version")"
+          test "$GITHUB_REF_NAME" = "$expected_tag"
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Show toolchain versions
-        run: |
-          node --version
-          npm --version
+      - name: Run linter
+        run: npm run lint
 
       - name: Run tests
         run: npm run test:run
@@ -46,11 +50,7 @@ jobs:
       - name: Dry-run npm publish
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode != 'publish'
         run: npm publish --dry-run --access public
-        env:
-          NODE_AUTH_TOKEN: ""
 
       - name: Publish to npm
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode == 'publish')
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ""
