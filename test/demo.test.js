@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -8,6 +9,31 @@ const read = (path) =>
 		join(dirname(fileURLToPath(import.meta.url)), '..', path),
 		'utf8',
 	);
+const fingerprint = (text) => createHash('sha256').update(text).digest('hex');
+const cdnFieldFingerprints = [
+	'8f8ad1d327eb5948926b758e27229d23ccf595e573d9486ed043baafd44fd5af',
+	'c9521030889cb98e5f7bb74b8da70980ec8b176a90089dfaeee1e641cdace581',
+	'eb53a68bf8b6d1ea28f612ccabc13f3a7256192b436329e292cd82cf0407ac74',
+	'a8a6104bf12bdc9bbb703fa74c71d394b7c9353fa751f40270da15344aa90aca',
+];
+// Preserve decoded snippet text, including whitespace; only the release pin varies.
+const snippetFingerprints = {
+	index: [
+		'1185f2878908b6cc3d7eee7aeee2e24d98e4e708a49b9c8d7d11866cdc15d471',
+		'8ec5c46d9824754c1a7c6bc8722ced89af727e85e9070dc9ed4a04ce5a78023d',
+		'9cf4f826ccfafb1858ddc90bd7c39c3afeddfc7ad6dbb8ca516ee8979de3e35a',
+		'5796501a98789942da4d8d2af0d79799998e920197cabd897e9996d1f515d396',
+	],
+	esm: [
+		fingerprint(`import { FormMatchingFieldsElement } from 'https://esm.sh/@aarongustafson/form-matching-fields@${JSON.parse(read('package.json')).version}/form-matching-fields.js?bundle&target=es2022';
+customElements.define('form-matching-fields', FormMatchingFieldsElement);`),
+		...cdnFieldFingerprints,
+	],
+	unpkg: [
+		'c007c16fe002ae5c25b5bba9ff8e96d72ff943316c8bd8bd3fc667ec2c1a3c86',
+		...cdnFieldFingerprints,
+	],
+};
 
 describe('demo accessibility contracts', () => {
 	it('pairs reading and control surfaces without replacing native focus', () => {
@@ -22,6 +48,37 @@ describe('demo accessibility contracts', () => {
 	});
 
 	for (const name of ['index', 'esm', 'unpkg']) {
+		it(`${name} highlights every component-specific snippet and no generic code`, () => {
+			document.body.innerHTML = read(`demo/${name}.html`).replace(
+				/<link[^>]*>/g,
+				'',
+			);
+			for (const code of document.querySelectorAll('pre code')) {
+				const expected = code.textContent.match(
+					/<\/?form-matching-fields\b[^>]*>|import[^\n]*@aarongustafson\/form-matching-fields[^\n]*;|customElements\.define\([^;\n]*\);|defineComponentName\(\);/g,
+				);
+				expect(expected?.length).toBeGreaterThan(0);
+				expect(code.querySelector('mark mark')).toBeNull();
+				expect(
+					[...code.querySelectorAll('mark')].map(
+						(mark) => mark.textContent,
+					),
+				).toEqual(expected);
+			}
+		});
+
+		it(`${name} preserves the exact decoded text of every displayed snippet`, () => {
+			document.body.innerHTML = read(`demo/${name}.html`).replace(
+				/<link[^>]*>/g,
+				'',
+			);
+			expect(
+				[...document.querySelectorAll('pre code')].map((code) =>
+					fingerprint(code.textContent),
+				),
+			).toEqual(snippetFingerprints[name]);
+		});
+
 		it(`${name} includes responsive pairs, localized labels, and failure guidance`, () => {
 			const html = read(`demo/${name}.html`);
 			document.body.innerHTML = html.replace(/<link[^>]*>/g, '');

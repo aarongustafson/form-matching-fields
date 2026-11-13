@@ -45,8 +45,8 @@
 					before comparing fields.
 				</p>
 				<div class="code-demo-pair">
-					<pre><code>import { FormMatchingFieldsElement } from 'https://esm.sh/@aarongustafson/form-matching-fields@1.0.1/form-matching-fields.js?bundle&amp;target=es2022';
-customElements.define('form-matching-fields', FormMatchingFieldsElement);</code></pre>
+					<pre><code><mark>import { FormMatchingFieldsElement } from 'https://esm.sh/@aarongustafson/form-matching-fields@1.0.1/form-matching-fields.js?bundle&amp;target=es2022';</mark>
+<mark>customElements.define('form-matching-fields', FormMatchingFieldsElement);</mark></code></pre>
 					<div class="demo">
 						<p>
 							The loading message above reports readiness or
@@ -59,10 +59,10 @@ customElements.define('form-matching-fields', FormMatchingFieldsElement);</code>
 			<section class="demo-section">
 				<h2>Password confirmation</h2>
 				<div class="code-demo-pair">
-					<pre><code>&lt;form-matching-fields&gt;
+					<pre><code><mark>&lt;form-matching-fields&gt;</mark>
   &lt;label&gt;Password &lt;input type="password" required&gt;&lt;/label&gt;
   &lt;label&gt;Password again &lt;input type="password" required&gt;&lt;/label&gt;
-&lt;/form-matching-fields&gt;</code></pre>
+<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
 					<div class="demo">
 						<form
 							data-success="The values match. This demo has not sent your entries."
@@ -100,10 +100,10 @@ customElements.define('form-matching-fields', FormMatchingFieldsElement);</code>
 			<section class="demo-section">
 				<h2>Email verification</h2>
 				<div class="code-demo-pair">
-					<pre><code>&lt;form-matching-fields&gt;
+					<pre><code><mark>&lt;form-matching-fields&gt;</mark>
   &lt;label&gt;Email &lt;input type="email" required&gt;&lt;/label&gt;
   &lt;label&gt;Verify email &lt;input type="email" required&gt;&lt;/label&gt;
-&lt;/form-matching-fields&gt;</code></pre>
+<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
 					<div class="demo">
 						<form
 							data-success="The values match. This demo has not sent your entries."
@@ -146,10 +146,10 @@ customElements.define('form-matching-fields', FormMatchingFieldsElement);</code>
 					or translate mismatch feedback.
 				</p>
 				<div class="code-demo-pair">
-					<pre><code>&lt;form-matching-fields validation-message="Please make sure {label_2} matches {label_1}."&gt;
+					<pre><code><mark>&lt;form-matching-fields validation-message="Please make sure {label_2} matches {label_1}."&gt;</mark>
   &lt;label&gt;Email &lt;input type="email" required&gt;&lt;/label&gt;
   &lt;label&gt;Verify email &lt;input type="email" required&gt;&lt;/label&gt;
-&lt;/form-matching-fields&gt;</code></pre>
+<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
 					<div class="demo">
 						<form
 							data-success="The values match. This demo has not sent your entries."
@@ -189,10 +189,10 @@ customElements.define('form-matching-fields', FormMatchingFieldsElement);</code>
 			<section class="demo-section">
 				<h2>Localized message (Hindi)</h2>
 				<div class="code-demo-pair">
-					<pre><code>&lt;form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"&gt;
+					<pre><code><mark>&lt;form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"&gt;</mark>
   &lt;label&gt;पासवर्ड &lt;input type="password" required&gt;&lt;/label&gt;
   &lt;label&gt;पासवर्ड फिर से &lt;input type="password" required&gt;&lt;/label&gt;
-&lt;/form-matching-fields&gt;</code></pre>
+<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
 					<div class="demo">
 						<form
 							lang="hi"

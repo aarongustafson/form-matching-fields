@@ -299,6 +299,43 @@ test('forced-color surfaces stay paired when gradients are suppressed', async ({
 	).toBeGreaterThanOrEqual(4.5);
 });
 
+for (const media of [
+	{ colorScheme: 'light' },
+	{ colorScheme: 'dark' },
+	{ forcedColors: 'active' },
+]) {
+	test(`${JSON.stringify(media)}: semantic snippet highlights retain contrast and narrow reflow`, async ({
+		page,
+	}) => {
+		await page.emulateMedia(media);
+		for (const name of pages) {
+			await demo(page, name);
+			const codes = page.locator('pre code');
+			for (const code of await codes.all()) {
+				await expect(code.locator('mark')).toHaveCount(2);
+				await expect(code.locator('mark mark')).toHaveCount(0);
+				for (const mark of await code.locator('mark').all()) {
+					expect((await contrast(mark)).text).toBeGreaterThanOrEqual(
+						4.5,
+					);
+				}
+			}
+			await page.setViewportSize({ width: 320, height: 800 });
+			await page.addStyleTag({ content: 'html { font-size: 32px; }' });
+			expect(
+				await page.evaluate(() => document.documentElement.scrollWidth),
+			).toBeLessThanOrEqual(320);
+			for (const pre of await page.locator('pre').all()) {
+				expect(
+					await pre.evaluate(
+						(element) => getComputedStyle(element).overflowX,
+					),
+				).toBe('auto');
+			}
+		}
+	});
+}
+
 for (const colorScheme of ['light', 'dark']) {
 	test(`${colorScheme}: actual native surfaces`, async ({
 		page,
