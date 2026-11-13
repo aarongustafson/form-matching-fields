@@ -1,6 +1,10 @@
 # form-matching-fields Web Component
 
-[![npm version](https://img.shields.io/npm/v/@aarongustafson/form-matching-fields.svg)](https://www.npmjs.com/package/@aarongustafson/form-matching-fields) [![Build Status](https://img.shields.io/github/actions/workflow/status/aarongustafson/form-matching-fields/ci.yml?branch=main)](https://github.com/aarongustafson/form-matching-fields/actions)
+[![npm version](https://img.shields.io/npm/v/@aarongustafson/form-matching-fields.svg)](https://www.npmjs.com/package/@aarongustafson/form-matching-fields)
+[![CI status](https://img.shields.io/github/actions/workflow/status/aarongustafson/form-matching-fields/ci.yml?branch=main&label=CI)](https://github.com/aarongustafson/form-matching-fields/actions/workflows/ci.yml)
+[![Minified + gzipped size](https://img.shields.io/bundlejs/size/@aarongustafson/form-matching-fields?format=minzip&label=min%2Bgzip)](https://bundlejs.com/?q=@aarongustafson/form-matching-fields)
+[![License](https://img.shields.io/npm/l/@aarongustafson/form-matching-fields)](https://github.com/aarongustafson/form-matching-fields/blob/main/LICENSE)
+[![Type definitions](https://img.shields.io/npm/types/@aarongustafson/form-matching-fields)](https://github.com/aarongustafson/form-matching-fields/blob/main/form-matching-fields.d.ts)
 
 Web component wrapper that adds additive validation to ensure two text-type fields match.
 
