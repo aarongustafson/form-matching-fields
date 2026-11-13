@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { request as httpRequest } from 'node:http';
 import { test, expect } from '@playwright/test';
 
 const read = (path) =>
@@ -274,6 +275,30 @@ test('all 19 study palettes retain reading, feedback, fields, buttons, and hover
 	}
 });
 
+test('forced-color surfaces stay paired when gradients are suppressed', async ({
+	page,
+}) => {
+	await demo(page, 'index.html');
+	// Activate authored forced-color rules with recorded colors, not an OS repaint.
+	const forcedStyles = substitute(palettes[15]).replaceAll(
+		'(forced-colors: active)',
+		'(min-width: 0px)',
+	);
+	await page.addStyleTag({
+		content: `${forcedStyles}\npre, input, button { background-image: none !important; }`,
+	});
+	for (const selector of ['pre', 'input', 'button']) {
+		const target = page.locator(selector).first();
+		expect((await contrast(target)).text, selector).toBeGreaterThanOrEqual(
+			4.5,
+		);
+	}
+	await page.locator('button').first().hover();
+	expect(
+		(await contrast(page.locator('button').first())).text,
+	).toBeGreaterThanOrEqual(4.5);
+});
+
 for (const colorScheme of ['light', 'dark']) {
 	test(`${colorScheme}: actual native surfaces`, async ({
 		page,
@@ -391,8 +416,13 @@ test('delayed upgrade preserves entered values and native focus', async ({
 	await expect(page.locator('[data-enhancement-status]')).toContainText(
 		'loading',
 	);
+	const form = page.locator('form').first();
+	await form.locator('button').click();
+	await expect(page.locator('input').first()).toBeFocused();
+	await expect(form.locator('[role="status"]')).not.toBeEmpty();
 	await page.locator('input').first().fill('one');
 	await page.locator('input').nth(1).fill('two');
+	await expect(form.locator('[role="status"]')).toBeEmpty();
 	release();
 	await expect(page.locator('[data-enhancement-status]')).toHaveText(
 		'Matching validation is ready.',
@@ -405,6 +435,59 @@ test('delayed upgrade preserves entered values and native focus', async ({
 			.nth(1)
 			.evaluate((field) => field.validity.customError),
 	).toBe(true);
+	await expect(form.locator('[role="status"]')).toHaveText(
+		await page
+			.locator('input')
+			.nth(1)
+			.evaluate((field) => field.validationMessage),
+	);
+});
+
+for (const name of pages) {
+	test(`${name}: failed helper import prevents navigation and preserves entries`, async ({
+		page,
+	}) => {
+		await page.route('**/demo/demo.js', (route) => route.abort());
+		await page.goto(`/demo/${name}`);
+		let navigations = 0;
+		page.on('framenavigated', (frame) => {
+			if (frame === page.mainFrame()) navigations++;
+		});
+		const form = page.locator('form').first();
+		await form.locator('button').click();
+		await expect(form.locator('input').first()).toBeFocused();
+		await form.locator('input').first().fill('keep first');
+		await form.locator('input').nth(1).fill('keep second');
+		await form.locator('input').nth(1).press('Enter');
+		await expect(form.locator('input').first()).toHaveValue('keep first');
+		await expect(form.locator('input').nth(1)).toHaveValue('keep second');
+		expect(navigations).toBe(0);
+		await expect(form.locator('input').nth(1)).toBeFocused();
+		await expect(page.locator('[data-enhancement-status]')).toContainText(
+			'could not load',
+		);
+		await expect(page.locator('[data-enhancement-status]')).toContainText(
+			'Reload',
+		);
+	});
+}
+
+test('malformed fixture URL is rejected without terminating the server', async ({
+	request,
+}) => {
+	const status = await new Promise((resolve, reject) => {
+		const request = httpRequest(
+			{ hostname: '127.0.0.1', port: 4187, path: '//[' },
+			(response) => {
+				response.resume();
+				response.on('end', () => resolve(response.statusCode));
+			},
+		);
+		request.on('error', reject);
+		request.end();
+	});
+	expect(status).toBe(404);
+	expect((await request.get('/demo/index.html')).status()).toBe(200);
 });
 
 test('JavaScript-off fallback keeps native labels, constraints, and editable fields', async ({

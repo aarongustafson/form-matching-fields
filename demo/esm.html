@@ -242,17 +242,27 @@ customElements.define('form-matching-fields', FormMatchingFieldsElement);</code>
 			</p>
 		</footer>
 		<script type="module">
-			import { enhanceDemos } from './demo.js';
-			enhanceDemos(async () => {
-				const { FormMatchingFieldsElement } =
-					await import('https://esm.sh/@aarongustafson/form-matching-fields@1.0.1/form-matching-fields.js?bundle&target=es2022');
-				if (!customElements.get('form-matching-fields')) {
-					customElements.define(
-						'form-matching-fields',
-						FormMatchingFieldsElement,
-					);
-				}
+			document.addEventListener('submit', (event) => {
+				event.preventDefault();
 			});
+			try {
+				const { enhanceDemos } = await import('./demo.js');
+				await enhanceDemos(async () => {
+					const { FormMatchingFieldsElement } =
+						await import('https://esm.sh/@aarongustafson/form-matching-fields@1.0.1/form-matching-fields.js?bundle&target=es2022');
+					if (!customElements.get('form-matching-fields')) {
+						customElements.define(
+							'form-matching-fields',
+							FormMatchingFieldsElement,
+						);
+					}
+				});
+			} catch {
+				const status = document.querySelector(
+					'[data-enhancement-status]',
+				);
+				status.textContent = status.dataset.failed;
+			}
 		</script>
 	</body>
 </html>

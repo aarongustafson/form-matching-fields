@@ -275,8 +275,18 @@
 		</footer>
 
 		<script type="module">
-			import { enhanceDemos } from './demo.js';
-			enhanceDemos(() => import('../define.js'));
+			document.addEventListener('submit', (event) => {
+				event.preventDefault();
+			});
+			try {
+				const { enhanceDemos } = await import('./demo.js');
+				await enhanceDemos(() => import('../define.js'));
+			} catch {
+				const status = document.querySelector(
+					'[data-enhancement-status]',
+				);
+				status.textContent = status.dataset.failed;
+			}
 		</script>
 	</body>
 </html>

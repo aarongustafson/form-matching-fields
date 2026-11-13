@@ -54,6 +54,33 @@ describe('demo feedback', () => {
 		document.body.innerHTML = '';
 	});
 
+	it('refreshes only previously reported feedback after a delayed upgrade changes validity', async () => {
+		document.body.innerHTML = `<p data-enhancement-status data-ready="Ready">Loading</p>
+			<form><input required><p role="status"></p></form>
+			<form><input required><p role="status"></p></form>`;
+		const { enhanceDemos } = await import('../demo/demo.js');
+		let release;
+		const loading = enhanceDemos(
+			() =>
+				new Promise((resolve) => {
+					release = resolve;
+				}),
+		);
+		const fields = document.querySelectorAll('input');
+		const feedback = document.querySelectorAll('form [role="status"]');
+		fields[0].dispatchEvent(new Event('invalid'));
+		expect(feedback[0].textContent).not.toBe('');
+		fields[0].value = 'nonempty';
+		fields[0].dispatchEvent(new Event('input', { bubbles: true }));
+		expect(feedback[0].textContent).toBe('');
+		for (const field of fields)
+			field.setCustomValidity('Mismatch after upgrade');
+		release();
+		await loading;
+		expect(feedback[0].textContent).toBe('Mismatch after upgrade');
+		expect(feedback[1].textContent).toBe('');
+	});
+
 	it('keeps native invalid handling and writes validation messages as text', async () => {
 		document.body.innerHTML = `<p data-enhancement-status data-ready="Ready" data-failed="Unavailable">Loading</p>
 			<form data-success="Accepted"><input required aria-describedby="feedback"><button>Submit</button><p id="feedback" role="status"></p></form>`;

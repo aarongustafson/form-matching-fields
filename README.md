@@ -157,12 +157,18 @@ example panels retain the button pair. Necessary field boundaries use their
 foreground, and keyboard focus keeps the browser’s native indicator. Hover adds
 an underline and a small foreground wash, without fading labels. Forced colors
 and increased contrast retain full-strength footer text and unmodified buttons.
+In forced colors, code, fields, and buttons use solid system surfaces rather than
+depending on gradients that browsers suppress.
 Keep foregrounds and surfaces together when overriding demo styles.
 
 Each demo also copies native validation feedback into a persistent, described
 text region after an invalid submission. These demo-only messages use
 `textContent`, don’t include entered values, and don’t replace native validation
-or move focus. The Hindi example authors its labels, mismatch message, and
+or move focus. If a form has already reported an error while the component loads,
+its feedback refreshes after upgrade applies matching validation. An independent
+inline submit guard prevents navigation even if the demo helper fails to load;
+the page then shows the authored failure and recovery guidance.
+The Hindi example authors its labels, mismatch message, and
 success text. Loading and import failures leave fields editable and explain
 recovery; without enhancement, required and email checks still work, but matching
 doesn’t. Always validate submitted values on the server. The demos have no

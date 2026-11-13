@@ -1,6 +1,7 @@
 export async function enhanceDemos(load) {
 	const status = document.querySelector('[data-enhancement-status]');
 	let enhanced = false;
+	const refreshReportedFeedback = [];
 	for (const form of document.querySelectorAll('form')) {
 		const feedback = form.querySelector('[role="status"]');
 		let reported = false;
@@ -10,6 +11,9 @@ export async function enhanceDemos(load) {
 			);
 			feedback.textContent = invalid?.validationMessage || '';
 		};
+		refreshReportedFeedback.push(() => {
+			if (reported) update();
+		});
 		form.addEventListener(
 			'invalid',
 			() => {
@@ -36,6 +40,7 @@ export async function enhanceDemos(load) {
 			throw new Error('Component registration unavailable');
 		}
 		enhanced = true;
+		for (const refresh of refreshReportedFeedback) refresh();
 		status.textContent = status.dataset.ready;
 	} catch {
 		status.textContent = status.dataset.failed;

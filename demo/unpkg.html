@@ -231,12 +231,22 @@ defineComponentName();</code></pre>
 			</p>
 		</footer>
 		<script type="module">
-			import { enhanceDemos } from './demo.js';
-			enhanceDemos(async () => {
-				const { defineComponentName } =
-					await import('https://unpkg.com/@aarongustafson/form-matching-fields@latest/define.js?module');
-				defineComponentName();
+			document.addEventListener('submit', (event) => {
+				event.preventDefault();
 			});
+			try {
+				const { enhanceDemos } = await import('./demo.js');
+				await enhanceDemos(async () => {
+					const { defineComponentName } =
+						await import('https://unpkg.com/@aarongustafson/form-matching-fields@latest/define.js?module');
+					defineComponentName();
+				});
+			} catch {
+				const status = document.querySelector(
+					'[data-enhancement-status]',
+				);
+				status.textContent = status.dataset.failed;
+			}
 		</script>
 	</body>
 </html>
