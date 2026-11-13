@@ -5,9 +5,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>&lt;form-matching-fields&gt; Web Component Demo</title>
 		<link rel="stylesheet" href="./styles.css" />
-		<style>
-			/* Demo-specific styles */
-		</style>
 	</head>
 	<body>
 		<header>
@@ -23,6 +20,28 @@
 		</header>
 
 		<main>
+			<p
+				data-enhancement-status
+				role="status"
+				data-ready="Matching validation is ready."
+				data-failed="Matching validation could not load. Native required and email checks still work; matching must be checked on the server. Reload to try again."
+			>
+				Matching validation is loading. Fields remain editable; native
+				required and email checks still work.
+			</p>
+			<p>
+				These forms don’t send or store your entries. Without
+				JavaScript, the browser checks required fields and email syntax,
+				but doesn’t compare values. Always verify matching values on the
+				server.
+			</p>
+			<noscript
+				><p>
+					JavaScript is off. Native validation still works; matching
+					needs a server check. These demonstration forms have no
+					submission endpoint.
+				</p></noscript
+			>
 			<section>
 				<h2>Password Confirmation</h2>
 				<p>Default validation message with required fields.</p>
@@ -38,11 +57,14 @@
   &lt;input id="password-again" type="password" required /&gt;
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
-							<form>
+							<form
+								data-success="The values match. This demo has not sent your entries."
+							>
 								<form-matching-fields>
 									<label for="password">Password</label>
 									<input
 										id="password"
+										aria-describedby="password-feedback"
 										type="password"
 										required
 									/>
@@ -52,11 +74,17 @@
 									>
 									<input
 										id="password-again"
+										aria-describedby="password-feedback"
 										type="password"
 										required
 									/>
 								</form-matching-fields>
 								<button type="submit">Submit</button>
+								<p
+									id="password-feedback"
+									class="feedback"
+									role="status"
+								></p>
 							</form>
 						</div>
 					</div>
@@ -80,21 +108,34 @@
   &lt;input id="email-again" type="email" required /&gt;
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
-							<form>
+							<form
+								data-success="The values match. This demo has not sent your entries."
+							>
 								<form-matching-fields>
 									<label for="email">Email</label>
-									<input id="email" type="email" required />
+									<input
+										id="email"
+										type="email"
+										required
+										aria-describedby="email-feedback"
+									/>
 
 									<label for="email-again"
 										>Verify email</label
 									>
 									<input
 										id="email-again"
+										aria-describedby="email-feedback"
 										type="email"
 										required
 									/>
 								</form-matching-fields>
 								<button type="submit">Submit</button>
+								<p
+									id="email-feedback"
+									class="feedback"
+									role="status"
+								></p>
 							</form>
 						</div>
 					</div>
@@ -119,13 +160,16 @@
   &lt;input id="email-custom-again" type="email" required /&gt;
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
-							<form>
+							<form
+								data-success="The values match. This demo has not sent your entries."
+							>
 								<form-matching-fields
 									validation-message="Please make sure {label_2} matches {label_1}."
 								>
 									<label for="email-custom">Email</label>
 									<input
 										id="email-custom"
+										aria-describedby="custom-feedback"
 										type="email"
 										required
 									/>
@@ -135,11 +179,17 @@
 									>
 									<input
 										id="email-custom-again"
+										aria-describedby="custom-feedback"
 										type="email"
 										required
 									/>
 								</form-matching-fields>
 								<button type="submit">Submit</button>
+								<p
+									id="custom-feedback"
+									class="feedback"
+									role="status"
+								></p>
 							</form>
 						</div>
 					</div>
@@ -161,13 +211,18 @@
   &lt;input id="password-hi-again" type="password" required /&gt;
 &lt;/form-matching-fields&gt;</code></pre>
 						<div class="demo">
-							<form>
+							<form
+								lang="hi"
+								data-failed="मिलान की जाँच उपलब्ध नहीं है। ब्राउज़र की सामान्य जाँच काम करती है; सर्वर पर मानों का मिलान जाँचें। फिर से कोशिश करने के लिए पेज रीलोड करें।"
+								data-success="मान समान हैं। इस डेमो ने आपकी जानकारी नहीं भेजी है।"
+							>
 								<form-matching-fields
 									validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"
 								>
 									<label for="password-hi">पासवर्ड</label>
 									<input
 										id="password-hi"
+										aria-describedby="hindi-feedback"
 										type="password"
 										required
 									/>
@@ -177,11 +232,17 @@
 									>
 									<input
 										id="password-hi-again"
+										aria-describedby="hindi-feedback"
 										type="password"
 										required
 									/>
 								</form-matching-fields>
 								<button type="submit">जमा करें</button>
+								<p
+									id="hindi-feedback"
+									class="feedback"
+									role="status"
+								></p>
 							</form>
 						</div>
 					</div>
@@ -213,15 +274,9 @@
 			</p>
 		</footer>
 
-		<script>
-			document.querySelectorAll('form').forEach((form) => {
-				form.addEventListener('submit', (event) => {
-					event.preventDefault();
-					form.reportValidity();
-				});
-			});
+		<script type="module">
+			import { enhanceDemos } from './demo.js';
+			enhanceDemos(() => import('../define.js'));
 		</script>
-
-		<script src="../define.js" type="module"></script>
 	</body>
 </html>

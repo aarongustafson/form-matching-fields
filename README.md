@@ -143,6 +143,35 @@ When replacing `{label_1}` and `{label_2}`, labels are resolved in this order:
 </form-matching-fields>
 ```
 
+## Styling and validation feedback
+
+The component doesn’t paint fields, messages, or focus indicators. Its existing
+shadow root only supplies a slot; labels, inputs, and buttons stay in the light
+DOM. Native validation still owns invalid-field focus and the browser’s validation
+message. Author `validation-message` and meaningful field labels to translate
+mismatch feedback; native required and email messages use the browser’s language.
+
+The demos pair reading surfaces with `CanvasText`/`Canvas`, code with
+`FieldText`/`Field`, and buttons with `ButtonText`/`ButtonFace`. Inline code and
+example panels retain the button pair. Necessary field boundaries use their
+foreground, and keyboard focus keeps the browser’s native indicator. Hover adds
+an underline and a small foreground wash, without fading labels. Forced colors
+and increased contrast retain full-strength footer text and unmodified buttons.
+Keep foregrounds and surfaces together when overriding demo styles.
+
+Each demo also copies native validation feedback into a persistent, described
+text region after an invalid submission. These demo-only messages use
+`textContent`, don’t include entered values, and don’t replace native validation
+or move focus. The Hindi example authors its labels, mismatch message, and
+success text. Loading and import failures leave fields editable and explain
+recovery; without enhancement, required and email checks still work, but matching
+doesn’t. Always validate submitted values on the server. The demos have no
+submission endpoint and don’t store entries.
+
+Recorded study palettes are regression inputs, not a guarantee for every platform
+or authored theme. Real Windows high-contrast themes and assistive-technology
+announcements still need platform testing.
+
 ## Browser Support
 
 This component uses modern web standards:
@@ -165,6 +194,10 @@ npm test
 # Run tests with coverage
 npm run test:coverage
 
+# Install browser engines once, then run browser checks (one worker)
+npx playwright install
+npm run test:browser
+
 # Lint code
 npm run lint
 
@@ -172,7 +205,8 @@ npm run lint
 npm run format
 
 # View demo
-open demo/index.html
+PORT=3010 node scripts/serve.js
+# Then open http://127.0.0.1:3010/demo/index.html
 ```
 
 ## License
