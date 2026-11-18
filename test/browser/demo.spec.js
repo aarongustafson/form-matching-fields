@@ -2,11 +2,21 @@ import { readFile } from 'node:fs/promises';
 import { request as httpRequest } from 'node:http';
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+	await page.route(
+		'https://cdn.jsdelivr.net/npm/microlighter@2.2.0/dist/**',
+		(route) => route.abort(),
+	);
+});
+
 const read = (path) =>
 	readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 const source = await read('form-matching-fields.js');
 const definition = await read('define.js');
-const css = await read('demo/styles.css');
+const css = [
+	await read('demo/styles.css'),
+	await read('demo/demo-shell.css'),
+].join('\n');
 const pages = ['index.html', 'esm.html', 'unpkg.html'];
 const tokens = [
 	'Canvas',
@@ -230,6 +240,9 @@ test('all 19 study palettes retain reading, feedback, fields, buttons, and hover
 		await fields.first().fill('one');
 		await fields.nth(1).fill('two');
 		await page.locator('form').first().locator('button').click();
+		await page
+			.locator('link[rel="stylesheet"]')
+			.evaluateAll((links) => links.forEach((link) => link.remove()));
 		const style = await page.addStyleTag({ content: css });
 		for (const [index, palette] of palettes.entries()) {
 			await style.evaluate((style, css) => {
