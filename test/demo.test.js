@@ -9,15 +9,22 @@ const read = (path) =>
 		'utf8',
 	);
 describe('demo accessibility contracts', () => {
+	it('trims block-edge margins inside demo sections', () => {
+		expect(read('demo/demo-shell.css')).toMatch(
+			/\.demo-section(?:,\s*\.api-reference)?\s*\{[^}]*\bmargin-trim:\s*block;/,
+		);
+	});
+
 	it('pairs reading and control surfaces without replacing native focus', () => {
 		const css = read('demo/styles.css');
 		expect(css).not.toMatch(
 			/GrayText|ActiveText|SelectedItem|Highlight|opacity:\s*0\.8/,
 		);
 		expect(css).not.toContain(':focus-visible');
-		expect(css).toContain('border: 1px solid currentColor');
-		expect(css).toContain('minmax(0, 1fr)');
-		expect(css).toContain('color-mix(in srgb, CanvasText 80%, Canvas)');
+		const shared = read('demo/demo-shell.css');
+		expect(shared).toContain('border: 1px solid currentColor');
+		expect(shared).toContain('minmax(0, 1fr)');
+		expect(shared).toContain('color-mix(in srgb, CanvasText 80%, Canvas)');
 	});
 
 	for (const name of ['index', 'esm', 'unpkg']) {

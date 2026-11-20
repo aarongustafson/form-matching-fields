@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { request as httpRequest } from 'node:http';
 import { test, expect } from '@playwright/test';
+import { readDemoStyles } from './demo-fixture.js';
 
 test.beforeEach(async ({ page }) => {
 	await page.route(
@@ -13,10 +14,7 @@ const read = (path) =>
 	readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 const source = await read('form-matching-fields.js');
 const definition = await read('define.js');
-const css = [
-	await read('demo/styles.css'),
-	await read('demo/demo-shell.css'),
-].join('\n');
+const css = await readDemoStyles();
 const pages = ['index.html', 'esm.html', 'unpkg.html'];
 const tokens = [
 	'Canvas',
