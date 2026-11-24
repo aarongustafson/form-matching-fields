@@ -9,7 +9,12 @@ export async function enhanceDemos(load) {
 			const invalid = [...form.elements].find(
 				(field) => field.willValidate && !field.validity.valid,
 			);
-			feedback.textContent = invalid?.validationMessage || '';
+			// Native browser messages can echo an email address or other entry.
+			feedback.textContent = invalid
+				? invalid.validity.customError
+					? invalid.validationMessage
+					: form.dataset.nativeError
+				: '';
 		};
 		refreshReportedFeedback.push(() => {
 			if (reported) update();
