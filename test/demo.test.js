@@ -28,6 +28,23 @@ describe('demo accessibility contracts', () => {
 	});
 
 	for (const name of ['index', 'esm', 'unpkg']) {
+		it(`${name} gives every code/live example its own unique destination`, () => {
+			const page = new DOMParser().parseFromString(
+				read(`demo/${name}.html`).replace(/<link[^>]*>/g, ''),
+				'text/html',
+			);
+			const ids = [...page.querySelectorAll('[id]')].map(
+				(element) => element.id,
+			);
+			expect(new Set(ids).size).toBe(ids.length);
+			for (const pair of page.querySelectorAll('.code-demo-pair')) {
+				const block = pair.closest('.demo-section');
+				expect(block.id).not.toBe('');
+				expect(block.querySelector('h2, h3')).toBeTruthy();
+				expect(block.querySelector('form')).toBeTruthy();
+			}
+		});
+
 		it(`${name} includes responsive pairs, localized labels, and failure guidance`, () => {
 			const html = read(`demo/${name}.html`);
 			document.body.innerHTML = html.replace(/<link[^>]*>/g, '');
@@ -62,8 +79,8 @@ describe('demo feedback', () => {
 
 	it('refreshes only previously reported feedback after a delayed upgrade changes validity', async () => {
 		document.body.innerHTML = `<p data-enhancement-status data-ready="Ready">Loading</p>
-			<form><input required><p role="status"></p></form>
-			<form><input required><p role="status"></p></form>`;
+			<form data-native-error="Check this field."><input required><p role="status"></p></form>
+			<form data-native-error="Check this field."><input required><p role="status"></p></form>`;
 		const { enhanceDemos } = await import('../demo/demo.js');
 		let release;
 		const loading = enhanceDemos(
@@ -107,6 +124,25 @@ describe('demo feedback', () => {
 		field.value = 'valid';
 		field.dispatchEvent(new Event('input', { bubbles: true }));
 		expect(feedback.textContent).toBe('');
+	});
+
+	it('does not echo entered values from native browser messages into persistent feedback', async () => {
+		document.body.innerHTML = `<p data-enhancement-status data-ready="Ready"></p>
+			<form data-native-error="Check this field’s required value and format.">
+			<input type="email" required><p role="status"></p></form>`;
+		const { enhanceDemos } = await import('../demo/demo.js');
+		await enhanceDemos(() => Promise.resolve());
+		const field = document.querySelector('input');
+		field.value = 'private-entry';
+		Object.defineProperty(field, 'validationMessage', {
+			value: 'Please include an @ in private-entry.',
+		});
+		field.dispatchEvent(new Event('invalid'));
+		const feedback = document.querySelector('form [role="status"]');
+		expect(feedback.textContent).toBe(
+			'Check this field’s required value and format.',
+		);
+		expect(feedback.textContent).not.toContain(field.value);
 	});
 
 	it('reports loading failure and still prevents demo form navigation', async () => {

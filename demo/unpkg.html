@@ -54,6 +54,15 @@
 				but doesn’t compare values. Always verify matching values on the
 				server.
 			</p>
+			<p>
+				Enter two different, nonempty passwords, then submit the first
+				form. Matching adds an error to the second field; the browser
+				focuses it. Make the values match and submit again. The live
+				examples also use a <a href="./demo.js">demo-only helper</a> for
+				persistent feedback. The code shows the native forms, not that
+				helper. See the <a href="./index.html">main walkthrough</a>
+				for matching, message, and label options.
+			</p>
 			<noscript
 				><p>
 					JavaScript is off. Native validation still works; matching
@@ -61,32 +70,26 @@
 					submission endpoint.
 				</p></noscript
 			>
-			<section class="demo-section">
+			<section class="demo-section" id="automatic-registration">
 				<h2>Automatic registration</h2>
-				<div class="code-demo-pair">
-					<micro-lighter
-						class="code-panel"
-						language="javascript"
-						controls="copy"
-						data-label="JavaScript"
-					>
-						<pre
-							aria-label="Automatic registration code 1"
-							tabindex="0"
-						><code><mark>import { defineComponentName } from 'https://unpkg.com/@aarongustafson/form-matching-fields@latest/define.js?module';</mark>
+				<p>
+					Importing <code>define.js</code> registers the element. The
+					exported helper also guards repeated calls.
+				</p>
+				<micro-lighter
+					class="code-panel"
+					language="javascript"
+					controls="copy"
+					data-label="JavaScript"
+				>
+					<pre
+						aria-label="Automatic registration code 1"
+						tabindex="0"
+					><code><mark>import { defineComponentName } from 'https://unpkg.com/@aarongustafson/form-matching-fields@latest/define.js?module';</mark>
 <mark>defineComponentName();</mark></code></pre>
-					</micro-lighter>
-					<div class="demo" data-demo-label="Live example">
-						<p>
-							The helper registers the element automatically and
-							guards repeated calls. The loading message above
-							reports readiness or import failure. Fields keep
-							native behavior while loading.
-						</p>
-					</div>
-				</div>
+				</micro-lighter>
 			</section>
-			<section class="demo-section">
+			<section class="demo-section" id="password-confirmation">
 				<h2>Password confirmation</h2>
 				<div class="code-demo-pair">
 					<micro-lighter
@@ -98,13 +101,19 @@
 						<pre
 							aria-label="Password confirmation code 2"
 							tabindex="0"
-						><code><mark>&lt;form-matching-fields&gt;</mark>
-  &lt;label&gt;Password &lt;input type="password" required&gt;&lt;/label&gt;
-  &lt;label&gt;Password again &lt;input type="password" required&gt;&lt;/label&gt;
-<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
+						><code>&lt;form&gt;
+<mark>&lt;form-matching-fields&gt;</mark>
+  &lt;label for="password-unpkg"&gt;Password&lt;/label&gt;
+  &lt;input id="password-unpkg" type="password" required&gt;
+  &lt;label for="password-unpkg-again"&gt;Password again&lt;/label&gt;
+  &lt;input id="password-unpkg-again" type="password" required&gt;
+<mark>&lt;/form-matching-fields&gt;</mark>
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</code></pre>
 					</micro-lighter>
 					<div class="demo" data-demo-label="Live example">
 						<form
+							data-native-error="Check this field’s required value and format."
 							data-success="The values match. This demo has not sent your entries."
 						>
 							<form-matching-fields>
@@ -135,7 +144,7 @@
 					</div>
 				</div>
 			</section>
-			<section class="demo-section">
+			<section class="demo-section" id="email-verification">
 				<h2>Email verification</h2>
 				<div class="code-demo-pair">
 					<micro-lighter
@@ -147,13 +156,19 @@
 						<pre
 							aria-label="Email verification code 3"
 							tabindex="0"
-						><code><mark>&lt;form-matching-fields&gt;</mark>
-  &lt;label&gt;Email &lt;input type="email" required&gt;&lt;/label&gt;
-  &lt;label&gt;Verify email &lt;input type="email" required&gt;&lt;/label&gt;
-<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
+						><code>&lt;form&gt;
+<mark>&lt;form-matching-fields&gt;</mark>
+  &lt;label for="email-unpkg"&gt;Email&lt;/label&gt;
+  &lt;input id="email-unpkg" type="email" required&gt;
+  &lt;label for="email-unpkg-again"&gt;Verify email&lt;/label&gt;
+  &lt;input id="email-unpkg-again" type="email" required&gt;
+<mark>&lt;/form-matching-fields&gt;</mark>
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</code></pre>
 					</micro-lighter>
 					<div class="demo" data-demo-label="Live example">
 						<form
+							data-native-error="Check this field’s required value and format."
 							data-success="The values match. This demo has not sent your entries."
 						>
 							<form-matching-fields>
@@ -184,12 +199,12 @@
 					</div>
 				</div>
 			</section>
-			<section class="demo-section">
+			<section class="demo-section" id="custom-mismatch-message">
 				<h2>Custom message</h2>
 				<p>
 					Use <code>validation-message</code> with
-					<code>{label_1}</code> and <code>{label_2}</code> to author
-					or translate mismatch feedback.
+					<code>{label_1}</code> and <code>{label_2}</code> to match
+					your application’s vocabulary before translating it.
 				</p>
 				<div class="code-demo-pair">
 					<micro-lighter
@@ -201,13 +216,19 @@
 						<pre
 							aria-label="Custom message code 4"
 							tabindex="0"
-						><code><mark>&lt;form-matching-fields validation-message="Please make sure {label_2} matches {label_1}."&gt;</mark>
-  &lt;label&gt;Email &lt;input type="email" required&gt;&lt;/label&gt;
-  &lt;label&gt;Verify email &lt;input type="email" required&gt;&lt;/label&gt;
-<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
+						><code>&lt;form&gt;
+<mark>&lt;form-matching-fields validation-message="Please make sure {label_2} matches {label_1}."&gt;</mark>
+  &lt;label for="email-unpkg-custom"&gt;Email&lt;/label&gt;
+  &lt;input id="email-unpkg-custom" type="email" required&gt;
+  &lt;label for="email-unpkg-custom-again"&gt;Verify email&lt;/label&gt;
+  &lt;input id="email-unpkg-custom-again" type="email" required&gt;
+<mark>&lt;/form-matching-fields&gt;</mark>
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</code></pre>
 					</micro-lighter>
 					<div class="demo" data-demo-label="Live example">
 						<form
+							data-native-error="Check this field’s required value and format."
 							data-success="The values match. This demo has not sent your entries."
 						>
 							<form-matching-fields
@@ -240,8 +261,12 @@
 					</div>
 				</div>
 			</section>
-			<section class="demo-section">
+			<section class="demo-section" id="hindi-mismatch-message">
 				<h2>Localized message (Hindi)</h2>
+				<p>
+					Translate the labels, mismatch message, and demo feedback.
+					Native required messages follow the browser’s language.
+				</p>
 				<div class="code-demo-pair">
 					<micro-lighter
 						class="code-panel"
@@ -252,14 +277,20 @@
 						<pre
 							aria-label="Localized message (Hindi) code 5"
 							tabindex="0"
-						><code><mark>&lt;form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"&gt;</mark>
-  &lt;label&gt;पासवर्ड &lt;input type="password" required&gt;&lt;/label&gt;
-  &lt;label&gt;पासवर्ड फिर से &lt;input type="password" required&gt;&lt;/label&gt;
-<mark>&lt;/form-matching-fields&gt;</mark></code></pre>
+						><code>&lt;form lang="hi"&gt;
+<mark>&lt;form-matching-fields validation-message="{label_1} और {label_2} का मान समान होना चाहिए।"&gt;</mark>
+  &lt;label for="password-unpkg-hi"&gt;पासवर्ड&lt;/label&gt;
+  &lt;input id="password-unpkg-hi" type="password" required&gt;
+  &lt;label for="password-unpkg-hi-again"&gt;पासवर्ड फिर से&lt;/label&gt;
+  &lt;input id="password-unpkg-hi-again" type="password" required&gt;
+<mark>&lt;/form-matching-fields&gt;</mark>
+  &lt;button type="submit"&gt;जमा करें&lt;/button&gt;
+&lt;/form&gt;</code></pre>
 					</micro-lighter>
 					<div class="demo" data-demo-label="Live example">
 						<form
 							lang="hi"
+							data-native-error="इस फ़ील्ड का आवश्यक मान और प्रारूप जाँचें।"
 							data-failed="मिलान की जाँच उपलब्ध नहीं है। ब्राउज़र की सामान्य जाँच काम करती है; सर्वर पर मानों का मिलान जाँचें। फिर से कोशिश करने के लिए पेज रीलोड करें।"
 							data-success="मान समान हैं। इस डेमो ने आपकी जानकारी नहीं भेजी है।"
 						>

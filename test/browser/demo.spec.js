@@ -162,8 +162,6 @@ for (const name of pages) {
 				.nth(1)
 				.evaluate((field) => getComputedStyle(field).outlineStyle),
 		).not.toBe('none');
-		await fields.nth(1).press('Enter');
-		await expect(fields.first()).toBeFocused();
 		await fields.first().fill('correct horse');
 		await fields.nth(1).fill('different');
 		await fields.nth(1).press('Enter');
@@ -179,6 +177,12 @@ for (const name of pages) {
 		await fields.nth(1).press('Enter');
 		await expect(form.locator('[role="status"]')).toContainText('not sent');
 		await expect(fields.nth(1)).toBeFocused();
+		await fields.first().fill('');
+		await fields.nth(1).press('Enter');
+		await expect(fields.first()).toBeFocused();
+		expect(
+			await fields.nth(1).evaluate((field) => field.validity.customError),
+		).toBe(false);
 		const hindi = page.locator('form[lang="hi"]');
 		await hindi.locator('input').first().fill('एक');
 		await hindi.locator('input').nth(1).fill('दो');
@@ -188,6 +192,11 @@ for (const name of pages) {
 		);
 		await expect(hindi.locator('input').nth(1)).toHaveAccessibleName(
 			'पासवर्ड फिर से',
+		);
+		await hindi.locator('input').nth(1).fill('एक');
+		await hindi.locator('input').nth(1).press('Enter');
+		await expect(hindi.locator('[role="status"]')).toHaveText(
+			await hindi.getAttribute('data-success'),
 		);
 		const email = page.locator('form').nth(1);
 		await email.locator('input').first().fill('one@example.com');
@@ -203,6 +212,68 @@ for (const name of pages) {
 					custom: field.validity.customError,
 				})),
 		).toEqual({ native: true, custom: false });
+		await expect(email.locator('[role="status"]')).toHaveText(
+			await email.getAttribute('data-native-error'),
+		);
+		await expect(email.locator('[role="status"]')).not.toContainText(
+			'not-an-email',
+		);
+		await email
+			.locator('input')
+			.nth(1)
+			.evaluate((field) => {
+				field.setCustomValidity('Application rule');
+			});
+		await email.locator('input').nth(1).fill('one@example.com');
+		await email.locator('input').nth(1).press('Enter');
+		await expect(email.locator('[role="status"]')).toHaveText(
+			'Application rule',
+		);
+		expect(
+			await email
+				.locator('input')
+				.nth(1)
+				.evaluate((field) => field.validationMessage),
+		).toBe('Application rule');
+	});
+
+	test(`${name}: example anchors resolve to unique headed blocks and submissions stay on the page`, async ({
+		page,
+	}) => {
+		await demo(page, name);
+		const ids = await page
+			.locator('[id]')
+			.evaluateAll((elements) => elements.map((element) => element.id));
+		expect(new Set(ids).size).toBe(ids.length);
+		const blocks = page.locator('.demo-section');
+		for (const block of await blocks.all()) {
+			const id = await block.getAttribute('id');
+			expect(id).toBeTruthy();
+			await page.goto(`/demo/${name}#${id}`);
+			await expect(block).toBeInViewport();
+			await expect(block.locator('h2, h3')).toBeVisible();
+		}
+		let navigations = 0;
+		page.on('framenavigated', (frame) => {
+			if (frame === page.mainFrame()) navigations++;
+		});
+		for (const form of await page.locator('form').all()) {
+			const fields = form.locator('input');
+			const value =
+				(await fields.first().getAttribute('type')) === 'email'
+					? 'sample@example.com'
+					: 'sample password';
+			await fields.first().fill(value);
+			await fields.nth(1).fill(value);
+			await fields.nth(1).press('Enter');
+			await expect(form.locator('[role="status"]')).toHaveText(
+				await form.getAttribute('data-success'),
+			);
+			await expect(form.locator('[role="status"]')).not.toContainText(
+				value,
+			);
+		}
+		expect(navigations).toBe(0);
 	});
 
 	test(`${name}: responsive code-left/live-right pairs and 320px reflow`, async ({
@@ -513,6 +584,13 @@ test('JavaScript-off fallback keeps native labels, constraints, and editable fie
 		await page.locator('form').first().locator('button').click();
 		await expect(page.locator('input').nth(1)).toBeFocused();
 		await expect(page.locator('input').first()).toHaveValue('native value');
+		await page.locator('input').nth(1).fill('different native value');
+		expect(
+			await page
+				.locator('form')
+				.first()
+				.evaluate((form) => form.checkValidity()),
+		).toBe(true);
 	}
 	await context.close();
 });
